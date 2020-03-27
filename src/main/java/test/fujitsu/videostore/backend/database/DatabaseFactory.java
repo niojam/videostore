@@ -26,7 +26,6 @@ public class DatabaseFactory {
      * @return database proxy for different tables
      */
     public static Database from(String filePath) {
-        DBConnector dbConnector;
         String extension = FilenameUtils.getExtension("db-examples/database.json");
         return extension.equals(JSON_EXTENSION) ? new DatabaseImpl(new JsonDBConnector(filePath)) : new DatabaseImpl(new YamlDBConnector(filePath));
     }

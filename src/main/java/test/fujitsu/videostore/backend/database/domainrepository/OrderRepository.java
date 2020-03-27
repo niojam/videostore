@@ -13,7 +13,6 @@ public class OrderRepository implements DBTableRepository<RentOrder> {
     public OrderRepository(DBConnector dbConnector) {
         this.dbConnector = dbConnector;
         orderList = this.dbConnector.readOrder();
-        this.remove(findById(1));
     }
 
     @Override
@@ -44,6 +43,7 @@ public class OrderRepository implements DBTableRepository<RentOrder> {
         if (object.isNewObject()) {
             object.setId(generateNextId());
             orderList.add(object);
+            dbConnector.writeOrderEntity(orderList);
             return object;
         }
 
@@ -52,7 +52,7 @@ public class OrderRepository implements DBTableRepository<RentOrder> {
         order.setCustomer(object.getCustomer());
         order.setOrderDate(order.getOrderDate());
         order.setItems(object.getItems());
-
+        dbConnector.writeOrderEntity(orderList);
         return order;
     }
 

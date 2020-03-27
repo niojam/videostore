@@ -29,14 +29,11 @@ public class JsonDBConnector implements DBConnector {
 
     @Override
     public List<?> readSimpleEntityData(String entityType, Type outputFormatType) {
-        List<Object> dataList = new ArrayList<>();
-
+        List<Object> dataList;
         Gson gson = new Gson();
         JsonObject jsonObject = readFile();
         JsonArray allData = jsonObject.getAsJsonArray(entityType);
         dataList = gson.fromJson(allData, outputFormatType);
-        String s = "d";
-
         return dataList;
     }
 
@@ -92,28 +89,30 @@ public class JsonDBConnector implements DBConnector {
         jsonObject.remove(ENTITY_TYPE_ORDER);
         JsonArray allOrders = new JsonArray();
         orders.forEach(order -> {
-            Map<String, Object> separateOrder = new LinkedHashMap<>();
-            separateOrder.put("id", order.getId());
-            separateOrder.put("customer", order.getCustomer().getId());
-            separateOrder.put("orderDate", order.getOrderDate().toString());
-            separateOrder.put("items", getOrderItemsToJson(order.getItems()));
-            allOrders.add(gson.toJson(separateOrder));
+            JsonObject separateOrder = new JsonObject();
+            separateOrder.addProperty("id", order.getId());
+            separateOrder.addProperty("customer", order.getCustomer().getId());
+            separateOrder.addProperty("orderDate", order.getOrderDate().toString());
+            separateOrder.add("items", getOrderItemsToJson(order.getItems()));
+            allOrders.add(separateOrder);
         });
+
+
         jsonObject.add("order", allOrders);
         writeFile(jsonObject);
 
     }
 
 
-    private List<Map<String, Object>> getOrderItemsToJson(List<RentOrder.Item> items) {
-        List<Map<String, Object>> orderItems = new ArrayList<>();
+    private JsonArray getOrderItemsToJson(List<RentOrder.Item> items) {
+        JsonArray orderItems = new JsonArray();
         items.forEach(item -> {
-            Map<String, Object> itemDetails = new LinkedHashMap<>();
-            itemDetails.put("movie", item.getMovie().getId());
-            itemDetails.put("type", item.getMovie().getType().getDatabaseId());
-            itemDetails.put("paidByBonus", item.isPaidByBonus());
-            itemDetails.put("days", item.getDays());
-            itemDetails.put("returnedDay", item.getReturnedDay());
+            JsonObject itemDetails = new JsonObject();
+            itemDetails.addProperty("movie", item.getMovie().getId());
+            itemDetails.addProperty("type", item.getMovie().getType().getDatabaseId());
+            itemDetails.addProperty("paidByBonus", item.isPaidByBonus());
+            itemDetails.addProperty("days", item.getDays());
+            itemDetails.addProperty("returnedDay", item.getReturnedDay() == null ? null : item.getReturnedDay().toString());
             orderItems.add(itemDetails);
         });
         return orderItems;
