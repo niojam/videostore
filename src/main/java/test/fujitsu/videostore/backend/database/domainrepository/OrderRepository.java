@@ -1,0 +1,63 @@
+package test.fujitsu.videostore.backend.database.domainrepository;
+
+import test.fujitsu.videostore.backend.database.DBConnector;
+import test.fujitsu.videostore.backend.database.DBTableRepository;
+import test.fujitsu.videostore.backend.domain.RentOrder;
+
+import java.util.List;
+
+public class OrderRepository implements DBTableRepository<RentOrder> {
+    private List<RentOrder> orderList;
+    private DBConnector dbConnector;
+
+    public OrderRepository(DBConnector dbConnector) {
+        this.dbConnector = dbConnector;
+        orderList = this.dbConnector.readOrder();
+        this.remove(findById(1));
+    }
+
+    @Override
+    public List<RentOrder> getAll() {
+        return orderList;
+    }
+
+    @Override
+    public RentOrder findById(int id) {
+        return getAll().stream().filter(order -> order.getId() == id).findFirst().get();
+    }
+
+    @Override
+    public boolean remove(RentOrder object) {
+        if (orderList.remove(object)) {
+            dbConnector.writeOrderEntity(orderList);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public RentOrder createOrUpdate(RentOrder object) {
+        if (object == null) {
+            return null;
+        }
+
+        if (object.isNewObject()) {
+            object.setId(generateNextId());
+            orderList.add(object);
+            return object;
+        }
+
+        RentOrder order = findById(object.getId());
+
+        order.setCustomer(object.getCustomer());
+        order.setOrderDate(order.getOrderDate());
+        order.setItems(object.getItems());
+
+        return order;
+    }
+
+    @Override
+    public int generateNextId() {
+        return orderList.size() + 1;
+    }
+}

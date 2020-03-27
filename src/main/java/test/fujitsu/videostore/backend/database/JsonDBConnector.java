@@ -1,0 +1,141 @@
+package test.fujitsu.videostore.backend.database;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import test.fujitsu.videostore.backend.database.domainrepository.CustomerRepository;
+import test.fujitsu.videostore.backend.database.domainrepository.MovieRepository;
+import test.fujitsu.videostore.backend.domain.RentOrder;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.time.LocalDate;
+import java.util.*;
+
+import static test.fujitsu.videostore.backend.database.DBTableRepository.ENTITY_TYPE_ORDER;
+
+
+public class JsonDBConnector implements DBConnector {
+
+    private String filepath;
+
+    public JsonDBConnector(String filepath) {
+        this.filepath = filepath;
+    }
+
+    @Override
+    public List<?> readSimpleEntityData(String entityType, Type outputFormatType) {
+        List<Object> dataList = new ArrayList<>();
+
+        Gson gson = new Gson();
+        JsonObject jsonObject = readFile();
+        JsonArray allData = jsonObject.getAsJsonArray(entityType);
+        dataList = gson.fromJson(allData, outputFormatType);
+        String s = "d";
+
+        return dataList;
+    }
+
+
+    @Override
+    public List<RentOrder> readOrder() {
+        List<RentOrder> rentOrders = new ArrayList<>();
+        CustomerRepository customerRepository = new CustomerRepository(this);
+        JsonObject jsonObject = readFile();
+        JsonArray allData = jsonObject.getAsJsonArray(ENTITY_TYPE_ORDER);
+        allData.forEach(order -> {
+            RentOrder newOrder = new RentOrder();
+            JsonObject orderObject = order.getAsJsonObject();
+            newOrder.setId(orderObject.get("id").getAsInt());
+            newOrder.setCustomer(customerRepository.findById(orderObject.get("customer").getAsInt()));
+            newOrder.setOrderDate(LocalDate.parse(orderObject.get("orderDate").getAsString()));
+            newOrder.setItems(getOrderItems(orderObject.getAsJsonArray("items")));
+            rentOrders.add(newOrder);
+        });
+        return rentOrders;
+    }
+
+
+    private List<RentOrder.Item> getOrderItems(JsonArray items) {
+        MovieRepository movieRepository = new MovieRepository(this);
+        List<RentOrder.Item> orderItems = new ArrayList<>();
+        items.forEach(item -> {
+            RentOrder.Item newItem = new RentOrder.Item();
+            JsonObject itemObject = item.getAsJsonObject();
+            newItem.setDays(itemObject.get("days").getAsInt());
+            newItem.setMovie(movieRepository.findById(itemObject.get("movie").getAsInt()));
+            newItem.setMovieType(newItem.getMovie().getType());
+            newItem.setPaidByBonus(itemObject.get("paidByBonus").getAsBoolean());
+            newItem.setReturnedDay(itemObject.get("returnedDay").isJsonNull() ? null : LocalDate.parse(itemObject.get("returnedDay").getAsString()));
+            orderItems.add(newItem);
+        });
+        return orderItems;
+    }
+
+    @Override
+    public void writeSimpleEntityData(List<?> writeData, String entityType, Type outputFormatType) {
+        Gson gson = new Gson();
+        JsonObject jsonObject = readFile();
+        jsonObject.remove(entityType);
+        jsonObject.add(entityType, new JsonParser().parse(gson.toJson(writeData, outputFormatType)));
+        writeFile(jsonObject);
+    }
+
+    @Override
+    public void writeOrderEntity(List<RentOrder> orders) {
+        Gson gson = new Gson();
+        JsonObject jsonObject = readFile();
+        jsonObject.remove(ENTITY_TYPE_ORDER);
+        JsonArray allOrders = new JsonArray();
+        orders.forEach(order -> {
+            Map<String, Object> separateOrder = new LinkedHashMap<>();
+            separateOrder.put("id", order.getId());
+            separateOrder.put("customer", order.getCustomer().getId());
+            separateOrder.put("orderDate", order.getOrderDate().toString());
+            separateOrder.put("items", getOrderItemsToJson(order.getItems()));
+            allOrders.add(gson.toJson(separateOrder));
+        });
+        jsonObject.add("order", allOrders);
+        writeFile(jsonObject);
+
+    }
+
+
+    private List<Map<String, Object>> getOrderItemsToJson(List<RentOrder.Item> items) {
+        List<Map<String, Object>> orderItems = new ArrayList<>();
+        items.forEach(item -> {
+            Map<String, Object> itemDetails = new LinkedHashMap<>();
+            itemDetails.put("movie", item.getMovie().getId());
+            itemDetails.put("type", item.getMovie().getType().getDatabaseId());
+            itemDetails.put("paidByBonus", item.isPaidByBonus());
+            itemDetails.put("days", item.getDays());
+            itemDetails.put("returnedDay", item.getReturnedDay());
+            orderItems.add(itemDetails);
+        });
+        return orderItems;
+    }
+
+    private void writeFile(JsonObject jsonObject) {
+        try {
+            FileWriter file = new FileWriter("db-examples/database.json");
+            file.write(jsonObject.toString());
+            file.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private JsonObject readFile() {
+        try {
+            return (JsonObject) new JsonParser().parse(new FileReader("db-examples/database.json"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return new JsonObject();
+    }
+}
