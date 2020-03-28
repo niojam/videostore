@@ -32,7 +32,7 @@ public class CustomerRepository implements DBTableRepository<Customer> {
     @Override
     public boolean remove(Customer object) {
         if (customerList.remove(object)) {
-            dbConnector.writeSimpleEntityData(customerList);
+            dbConnector.writeData(customerList);
             return true;
         }
         return false;
@@ -47,7 +47,7 @@ public class CustomerRepository implements DBTableRepository<Customer> {
         if (object.isNewObject()) {
             object.setId(generateNextId());
             customerList.add(object);
-            dbConnector.writeSimpleEntityData(customerList);
+            dbConnector.writeData(customerList);
             return object;
         }
 
@@ -55,7 +55,7 @@ public class CustomerRepository implements DBTableRepository<Customer> {
 
         customer.setName(object.getName());
         customer.setPoints(object.getPoints());
-        dbConnector.writeSimpleEntityData(customerList);
+        dbConnector.writeData(customerList);
         return customer;
     }
 

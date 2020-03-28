@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import org.apache.commons.io.FilenameUtils;
-import test.fujitsu.videostore.backend.domain.RentOrder;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,11 +45,7 @@ public abstract class DBConnector<T> {
         return new LinkedHashMap<>();
     }
 
-    public abstract void writeSimpleEntityData(List<T> writeData);
-
-    public abstract List<RentOrder> readOrder();
-
-    public abstract void writeOrderEntity(List<RentOrder> orders);
+    public abstract void writeData(List<T> writeData);
 
     public ObjectMapper getObjectMapper() {
         return FilenameUtils.getExtension(filePath).equals(JSON_EXTENSION) ? new ObjectMapper() :

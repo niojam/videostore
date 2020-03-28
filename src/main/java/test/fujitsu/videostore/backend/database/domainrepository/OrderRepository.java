@@ -1,5 +1,6 @@
 package test.fujitsu.videostore.backend.database.domainrepository;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import test.fujitsu.videostore.backend.database.DBConnector;
 import test.fujitsu.videostore.backend.database.DBTableRepository;
 import test.fujitsu.videostore.backend.domain.RentOrder;
@@ -12,7 +13,8 @@ public class OrderRepository implements DBTableRepository<RentOrder> {
 
     public OrderRepository(DBConnector<RentOrder> dbConnector) {
         this.dbConnector = dbConnector;
-        orderList = this.dbConnector.readOrder();
+        orderList = this.dbConnector.readData(ENTITY_TYPE_ORDER, new TypeReference<List<RentOrder>>() {
+        });
     }
 
     @Override
@@ -28,7 +30,7 @@ public class OrderRepository implements DBTableRepository<RentOrder> {
     @Override
     public boolean remove(RentOrder object) {
         if (orderList.remove(object)) {
-            dbConnector.writeOrderEntity(orderList);
+            dbConnector.writeData(orderList);
             return true;
         }
         return false;
@@ -43,7 +45,7 @@ public class OrderRepository implements DBTableRepository<RentOrder> {
         if (object.isNewObject()) {
             object.setId(generateNextId());
             orderList.add(object);
-            dbConnector.writeOrderEntity(orderList);
+            dbConnector.writeData(orderList);
             return object;
         }
 
@@ -52,7 +54,7 @@ public class OrderRepository implements DBTableRepository<RentOrder> {
         order.setCustomer(object.getCustomer());
         order.setOrderDate(order.getOrderDate());
         order.setItems(object.getItems());
-        dbConnector.writeOrderEntity(orderList);
+        dbConnector.writeData(orderList);
         return order;
     }
 

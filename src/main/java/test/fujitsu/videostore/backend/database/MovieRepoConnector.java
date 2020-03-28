@@ -19,7 +19,7 @@ public class MovieRepoConnector extends DBConnector<Movie> {
     }
 
     @Override
-    public void writeSimpleEntityData(List<Movie> writeData) {
+    public void writeData(List<Movie> writeData) {
         ObjectMapper mapper = super.getObjectMapper();
         Map<String, List<Map<String, Object>>> fileMap = super.readFile(mapper);
         List<Map<String, Object>> allMovies = new ArrayList<>();
@@ -39,13 +39,5 @@ public class MovieRepoConnector extends DBConnector<Movie> {
         }
     }
 
-    @Override
-    public List<RentOrder> readOrder() {
-        return null;
-    }
 
-    @Override
-    public void writeOrderEntity(List<RentOrder> orders) {
-
-    }
 }

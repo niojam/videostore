@@ -34,7 +34,7 @@ public class MovieRepository implements DBTableRepository<Movie> {
     @Override
     public boolean remove(Movie object) {
         if (movieList.remove(object)) {
-            dbConnector.writeSimpleEntityData(movieList);
+            dbConnector.writeData(movieList);
             return true;
         }
         return false;
@@ -49,7 +49,7 @@ public class MovieRepository implements DBTableRepository<Movie> {
         if (object.isNewObject()) {
             object.setId(generateNextId());
             movieList.add(object);
-            dbConnector.writeSimpleEntityData(movieList);
+            dbConnector.writeData(movieList);
             return object;
         }
 
@@ -58,7 +58,7 @@ public class MovieRepository implements DBTableRepository<Movie> {
         movie.setName(object.getName());
         movie.setStockCount(object.getStockCount());
         movie.setType(object.getType());
-        dbConnector.writeSimpleEntityData(movieList);
+        dbConnector.writeData(movieList);
         return movie;
     }
 

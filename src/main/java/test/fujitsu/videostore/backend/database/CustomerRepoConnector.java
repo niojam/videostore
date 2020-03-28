@@ -2,7 +2,6 @@ package test.fujitsu.videostore.backend.database;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import test.fujitsu.videostore.backend.domain.Customer;
-import test.fujitsu.videostore.backend.domain.RentOrder;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,8 +18,11 @@ public class CustomerRepoConnector extends DBConnector<Customer> {
         super(filepath);
     }
 
+
+
+
     @Override
-    public void writeSimpleEntityData(List<Customer> writeData) {
+    public void writeData(List<Customer> writeData) {
         ObjectMapper mapper = super.getObjectMapper();
         Map<String, List<Map<String, Object>>> fileMap = super.readFile(mapper);
         List<Map<String, Object>> allCustomers = new ArrayList<>();
@@ -29,6 +31,7 @@ public class CustomerRepoConnector extends DBConnector<Customer> {
                 Map<String, Object> customerEntity = new LinkedHashMap<>();
                 customerEntity.put("id", customer.getId());
                 customerEntity.put("name", customer.getName());
+                customerEntity.put("points", customer.getPoints());
                 allCustomers.add(customerEntity);
             });
             fileMap.put(ENTITY_TYPE_CUSTOMER, allCustomers);
@@ -38,14 +41,5 @@ public class CustomerRepoConnector extends DBConnector<Customer> {
         }
     }
 
-    @Override
-    public List<RentOrder> readOrder() {
-        return null;
-    }
-
-    @Override
-    public void writeOrderEntity(List<RentOrder> orders) {
-
-    }
 
 }
