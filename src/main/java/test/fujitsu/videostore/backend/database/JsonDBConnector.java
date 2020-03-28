@@ -22,15 +22,16 @@ import static test.fujitsu.videostore.backend.database.DBTableRepository.ENTITY_
 public class JsonDBConnector implements DBConnector {
 
     private String filepath;
+    private Gson gson;
 
     public JsonDBConnector(String filepath) {
+        this.gson = new Gson();
         this.filepath = filepath;
     }
 
     @Override
     public List<?> readSimpleEntityData(String entityType, Type outputFormatType) {
         List<Object> dataList;
-        Gson gson = new Gson();
         JsonObject jsonObject = readFile();
         JsonArray allData = jsonObject.getAsJsonArray(entityType);
         dataList = gson.fromJson(allData, outputFormatType);
@@ -75,7 +76,6 @@ public class JsonDBConnector implements DBConnector {
 
     @Override
     public void writeSimpleEntityData(List<?> writeData, String entityType, Type outputFormatType) {
-        Gson gson = new Gson();
         JsonObject jsonObject = readFile();
         jsonObject.remove(entityType);
         jsonObject.add(entityType, new JsonParser().parse(gson.toJson(writeData, outputFormatType)));
@@ -84,7 +84,6 @@ public class JsonDBConnector implements DBConnector {
 
     @Override
     public void writeOrderEntity(List<RentOrder> orders) {
-        Gson gson = new Gson();
         JsonObject jsonObject = readFile();
         jsonObject.remove(ENTITY_TYPE_ORDER);
         JsonArray allOrders = new JsonArray();
