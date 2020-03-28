@@ -8,9 +8,9 @@ import java.util.List;
 
 public class OrderRepository implements DBTableRepository<RentOrder> {
     private List<RentOrder> orderList;
-    private DBConnector dbConnector;
+    private DBConnector<RentOrder> dbConnector;
 
-    public OrderRepository(DBConnector dbConnector) {
+    public OrderRepository(DBConnector<RentOrder> dbConnector) {
         this.dbConnector = dbConnector;
         orderList = this.dbConnector.readOrder();
     }

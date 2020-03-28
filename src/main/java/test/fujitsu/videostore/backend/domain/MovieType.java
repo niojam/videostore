@@ -1,6 +1,7 @@
 package test.fujitsu.videostore.backend.domain;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Movie type
@@ -8,9 +9,9 @@ import com.google.gson.annotations.SerializedName;
  */
 public enum MovieType {
 
-    @SerializedName("1") NEW(1, "New release"),
-    @SerializedName("2") REGULAR(2, "Regular rental"),
-    @SerializedName("3") OLD(3, "Old film");
+    @JsonProperty("1") NEW(1, "New release"),
+    @JsonProperty("2") REGULAR(2, "Regular rental"),
+    @JsonProperty("3") OLD(3, "Old film");
 
     /**
      * Movie type representation in database
@@ -33,5 +34,15 @@ public enum MovieType {
 
     public int getDatabaseId() {
         return databaseId;
+    }
+
+    @JsonCreator
+    public static MovieType getNameByValue(final int value) {
+        for (final MovieType m : MovieType.values()) {
+            if (m.getDatabaseId() == value) {
+                return m;
+            }
+        }
+        return null;
     }
 }

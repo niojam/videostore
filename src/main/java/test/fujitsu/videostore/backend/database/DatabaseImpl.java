@@ -9,24 +9,24 @@ import test.fujitsu.videostore.backend.domain.RentOrder;
 
 public class DatabaseImpl implements Database {
 
-    DBConnector dbConnector;
+    String filepath;
 
-    DatabaseImpl(DBConnector dbConnector) {
-        this.dbConnector = dbConnector;
+    DatabaseImpl(String filepath) {
+        this.filepath = filepath;
     }
 
     @Override
     public DBTableRepository<Movie> getMovieTable() {
-        return new MovieRepository(dbConnector);
+        return new MovieRepository(new MovieRepoConnector(filepath));
     }
 
     @Override
     public DBTableRepository<Customer> getCustomerTable() {
-        return new CustomerRepository(dbConnector);
+        return new CustomerRepository(new CustomerRepoConnector(filepath));
     }
 
     @Override
     public DBTableRepository<RentOrder> getOrderTable() {
-        return new OrderRepository(dbConnector);
+        return new OrderRepository(new OrderRepoConnector(filepath));
     }
 }

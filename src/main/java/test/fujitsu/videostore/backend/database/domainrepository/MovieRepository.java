@@ -1,25 +1,23 @@
 package test.fujitsu.videostore.backend.database.domainrepository;
 
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.type.TypeReference;
 import test.fujitsu.videostore.backend.database.DBConnector;
 import test.fujitsu.videostore.backend.database.DBTableRepository;
 import test.fujitsu.videostore.backend.domain.Movie;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MovieRepository implements DBTableRepository<Movie> {
 
 
     private List<Movie> movieList;
-    private DBConnector dbConnector;
-    private Type type = new TypeToken<ArrayList<Movie>>() {
-    }.getType();
+    private DBConnector<Movie> dbConnector;
+    private TypeReference<?> type = new TypeReference<List<Movie>>() {
+    };
 
-    public MovieRepository(DBConnector dbConnector) {
+    public MovieRepository(DBConnector<Movie> dbConnector) {
         this.dbConnector = dbConnector;
-        movieList = (List<Movie>) this.dbConnector.readSimpleEntityData(ENTITY_TYPE_MOVIE, type);
+        movieList = this.dbConnector.readData(ENTITY_TYPE_MOVIE, type);
     }
 
 
@@ -36,7 +34,7 @@ public class MovieRepository implements DBTableRepository<Movie> {
     @Override
     public boolean remove(Movie object) {
         if (movieList.remove(object)) {
-            dbConnector.writeSimpleEntityData(movieList, ENTITY_TYPE_MOVIE, type);
+            dbConnector.writeSimpleEntityData(movieList);
             return true;
         }
         return false;
@@ -51,7 +49,7 @@ public class MovieRepository implements DBTableRepository<Movie> {
         if (object.isNewObject()) {
             object.setId(generateNextId());
             movieList.add(object);
-            dbConnector.writeSimpleEntityData(movieList, ENTITY_TYPE_MOVIE, type);
+            dbConnector.writeSimpleEntityData(movieList);
             return object;
         }
 
@@ -60,7 +58,7 @@ public class MovieRepository implements DBTableRepository<Movie> {
         movie.setName(object.getName());
         movie.setStockCount(object.getStockCount());
         movie.setType(object.getType());
-        dbConnector.writeSimpleEntityData(movieList, ENTITY_TYPE_MOVIE, type);
+        dbConnector.writeSimpleEntityData(movieList);
         return movie;
     }
 

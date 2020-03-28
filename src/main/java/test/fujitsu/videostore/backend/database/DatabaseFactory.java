@@ -1,7 +1,5 @@
 package test.fujitsu.videostore.backend.database;
 
-import org.apache.commons.io.FilenameUtils;
-
 /**
  * Database Factory.
  * <p>
@@ -9,9 +7,7 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class DatabaseFactory {
 
-    public static final String JSON_EXTENSION = "json";
-    public static final String YAML_EXTENSION = "yaml";
-    public static final String EXCEPTION_MESSAGE = "Application supports only .json or .yaml formats";
+
 
     /**
      * Creates database "connection"/opens database from path.
@@ -26,7 +22,6 @@ public class DatabaseFactory {
      * @return database proxy for different tables
      */
     public static Database from(String filePath) {
-        String extension = FilenameUtils.getExtension("db-examples/database.json");
-        return extension.equals(JSON_EXTENSION) ? new DatabaseImpl(new JsonDBConnector(filePath)) : new DatabaseImpl(new YamlDBConnector(filePath));
+        return new DatabaseImpl(filePath);
     }
 }

@@ -1,24 +1,21 @@
 package test.fujitsu.videostore.backend.database.domainrepository;
 
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.type.TypeReference;
 import test.fujitsu.videostore.backend.database.DBConnector;
 import test.fujitsu.videostore.backend.database.DBTableRepository;
 import test.fujitsu.videostore.backend.domain.Customer;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CustomerRepository implements DBTableRepository<Customer> {
 
     private List<Customer> customerList;
-    private DBConnector dbConnector;
-    private Type type = new TypeToken<ArrayList<Customer>>() {
-    }.getType();
+    private DBConnector<Customer> dbConnector;
+    private TypeReference<?> type = new TypeReference<List<Customer>>(){};
 
-    public CustomerRepository(DBConnector dbConnector) {
+    public CustomerRepository(DBConnector<Customer> dbConnector) {
         this.dbConnector = dbConnector;
-        customerList = (List<Customer>) this.dbConnector.readSimpleEntityData(ENTITY_TYPE_CUSTOMER, type);
+        customerList = (List<Customer>) this.dbConnector.readData(ENTITY_TYPE_CUSTOMER, type);
     }
 
 
@@ -35,7 +32,7 @@ public class CustomerRepository implements DBTableRepository<Customer> {
     @Override
     public boolean remove(Customer object) {
         if (customerList.remove(object)) {
-            dbConnector.writeSimpleEntityData(customerList, ENTITY_TYPE_CUSTOMER, type);
+            dbConnector.writeSimpleEntityData(customerList);
             return true;
         }
         return false;
@@ -50,7 +47,7 @@ public class CustomerRepository implements DBTableRepository<Customer> {
         if (object.isNewObject()) {
             object.setId(generateNextId());
             customerList.add(object);
-            dbConnector.writeSimpleEntityData(customerList, ENTITY_TYPE_CUSTOMER, type);
+            dbConnector.writeSimpleEntityData(customerList);
             return object;
         }
 
@@ -58,7 +55,7 @@ public class CustomerRepository implements DBTableRepository<Customer> {
 
         customer.setName(object.getName());
         customer.setPoints(object.getPoints());
-        dbConnector.writeSimpleEntityData(customerList, ENTITY_TYPE_CUSTOMER, type);
+        dbConnector.writeSimpleEntityData(customerList);
         return customer;
     }
 
