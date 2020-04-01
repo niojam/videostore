@@ -1,4 +1,4 @@
-package test.fujitsu.videostore.backend.database;
+package test.fujitsu.videostore.backend.database.connector;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,9 +20,9 @@ public abstract class DBConnector<T> {
 
     private String filePath;
 
-    DBConnector(String filepath) {
+    public DBConnector(String filepath) {
         this.filePath = filepath;
-        this.filePath = "db-examples/database.yaml";
+        this.filePath = "db-examples/database.json";
     }
 
     public List<T> readData(String entityType, TypeReference<?> outputFormatType) {
@@ -36,7 +36,7 @@ public abstract class DBConnector<T> {
     public Map<String, List<Map<String, Object>>> readFile(ObjectMapper mapper) {
         try {
             return mapper.readValue(
-                    new File("db-examples/database.yaml"),
+                    new File(filePath),
                     new TypeReference<Map<String, List<Object>>>() {
                     });
         } catch (IOException e) {
@@ -46,6 +46,14 @@ public abstract class DBConnector<T> {
     }
 
     public abstract void writeData(List<T> writeData);
+
+    public void updateDataBase(Map<String, List<Map<String, Object>>> fileMap){
+        try {
+            getObjectMapper().writeValue(new File(filePath), fileMap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public ObjectMapper getObjectMapper() {
         return FilenameUtils.getExtension(filePath).equals(JSON_EXTENSION) ? new ObjectMapper() :

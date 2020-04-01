@@ -1,14 +1,13 @@
-package test.fujitsu.videostore.backend.database;
+package test.fujitsu.videostore.backend.database.connector;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.apache.commons.lang3.StringUtils;
 import test.fujitsu.videostore.backend.database.domainrepository.CustomerRepository;
 import test.fujitsu.videostore.backend.database.domainrepository.MovieRepository;
 import test.fujitsu.videostore.backend.domain.RentOrder;
 
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -18,7 +17,8 @@ import java.util.Map;
 import static test.fujitsu.videostore.backend.database.DBTableRepository.ENTITY_TYPE_ORDER;
 
 public class OrderRepoConnector extends DBConnector<RentOrder> {
-    OrderRepoConnector(String filepath) {
+
+    public OrderRepoConnector(String filepath) {
         super(filepath);
     }
 
@@ -48,7 +48,7 @@ public class OrderRepoConnector extends DBConnector<RentOrder> {
             newItem.setMovieType(newItem.getMovie().getType());
             newItem.setPaidByBonus((boolean) rentOrderItem.get("paidByBonus"));
             newItem.setDays((Integer) rentOrderItem.get("days"));
-            newItem.setReturnedDay(rentOrderItem.get("returnedDay") == null ? null
+            newItem.setReturnedDay(StringUtils.isEmpty((String) rentOrderItem.get("returnedDay")) ? null
                     : LocalDate.parse((String) rentOrderItem.get("returnedDay")));
             orderItems.add(newItem);
         });
@@ -60,20 +60,16 @@ public class OrderRepoConnector extends DBConnector<RentOrder> {
         ObjectMapper mapper = super.getObjectMapper();
         Map<String, List<Map<String, Object>>> fileMap = super.readFile(mapper);
         List<Map<String, Object>> allOrders = new ArrayList<>();
-        try {
-            writeData.forEach(order -> {
-                Map<String, Object> orderEntity = new LinkedHashMap<>();
-                orderEntity.put("id", order.getId());
-                orderEntity.put("orderDate", order.getOrderDate());
-                orderEntity.put("customer", order.getCustomer().getId());
-                orderEntity.put("items", getOrderItems(order));
-                allOrders.add(orderEntity);
-            });
-            fileMap.put(ENTITY_TYPE_ORDER, allOrders);
-            mapper.writeValue(new File(super.getFilePath()), fileMap);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        writeData.forEach(order -> {
+            Map<String, Object> orderEntity = new LinkedHashMap<>();
+            orderEntity.put("id", order.getId());
+            orderEntity.put("orderDate", order.getOrderDate().toString());
+            orderEntity.put("customer", order.getCustomer().getId());
+            orderEntity.put("items", getOrderItems(order));
+            allOrders.add(orderEntity);
+        });
+        fileMap.put(ENTITY_TYPE_ORDER, allOrders);
+        super.updateDataBase(fileMap);
     }
 
     private List<Map<String, Object>> getOrderItems(RentOrder order) {
@@ -84,7 +80,7 @@ public class OrderRepoConnector extends DBConnector<RentOrder> {
             itemEntity.put("type", item.getMovie().getType().getDatabaseId());
             itemEntity.put("paidByBonus", item.isPaidByBonus());
             itemEntity.put("days", item.getDays());
-            itemEntity.put("returnedDay", item.getReturnedDay());
+            itemEntity.put("returnedDay", item.getReturnedDay() == null ? "" : item.getReturnedDay().toString());
             orderItems.add(itemEntity);
         });
         return orderItems;
