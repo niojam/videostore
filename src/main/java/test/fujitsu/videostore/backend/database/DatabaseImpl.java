@@ -1,5 +1,8 @@
 package test.fujitsu.videostore.backend.database;
 
+import test.fujitsu.videostore.backend.database.connector.CustomerRepoConnector;
+import test.fujitsu.videostore.backend.database.connector.MovieRepoConnector;
+import test.fujitsu.videostore.backend.database.connector.OrderRepoConnector;
 import test.fujitsu.videostore.backend.database.domainrepository.CustomerRepository;
 import test.fujitsu.videostore.backend.database.domainrepository.MovieRepository;
 import test.fujitsu.videostore.backend.database.domainrepository.OrderRepository;
