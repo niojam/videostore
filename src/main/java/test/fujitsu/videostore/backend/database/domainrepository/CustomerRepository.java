@@ -1,7 +1,7 @@
 package test.fujitsu.videostore.backend.database.domainrepository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import test.fujitsu.videostore.backend.database.DBConnector;
+import test.fujitsu.videostore.backend.database.connector.DBConnector;
 import test.fujitsu.videostore.backend.database.DBTableRepository;
 import test.fujitsu.videostore.backend.domain.Customer;
 
