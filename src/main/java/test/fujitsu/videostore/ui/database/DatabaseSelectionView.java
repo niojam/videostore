@@ -4,18 +4,28 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.HtmlImport;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.apache.commons.io.FilenameUtils;
+import test.fujitsu.videostore.backend.excetion.InvalidDbPathException;
+
+import java.io.File;
+
+import static test.fujitsu.videostore.backend.database.connector.DBConnector.JSON_EXTENSION;
+import static test.fujitsu.videostore.backend.database.connector.DBConnector.YAML_EXTENSION;
 
 @Route("DatabaseSelection")
 @PageTitle("Database Selection")
 @HtmlImport("css/shared-styles.html")
 public class DatabaseSelectionView extends FlexLayout {
 
+    public static final String WRONG_INPUT = "DB File is missing or Unknown format";
+    public static final String ERROR_NOTIFICATION_TEXT = "Database file path is incorrect";
     private TextField databasePath;
     private Button selectDatabaseButton;
 
@@ -56,15 +66,27 @@ public class DatabaseSelectionView extends FlexLayout {
 
     private void selectDatabase() {
         selectDatabaseButton.setEnabled(false);
+
         try {
-            // TODO: Make validations against selected database. If there will be an error, then show notification with
-            // using https://vaadin.com/api/platform/com/vaadin/flow/component/notification/Notification.html
-
-            CurrentDatabase.set(databasePath.getValue());
-
+            String filepath = databasePath.getValue();
+            validateInputDbPath(filepath);
+            CurrentDatabase.set(filepath);
             getUI().get().navigate("");
+        } catch (InvalidDbPathException e) {
+            Notification notification = new Notification(
+                    ERROR_NOTIFICATION_TEXT, 3000, Notification.Position.BOTTOM_CENTER);
+            notification.open();
+            e.printStackTrace();
         } finally {
             selectDatabaseButton.setEnabled(true);
+        }
+    }
+
+    private void validateInputDbPath(String filepath) throws InvalidDbPathException {
+        String fileExtension = FilenameUtils.getExtension(filepath);
+        if (!(new File(filepath).exists() &
+                (fileExtension.equals(JSON_EXTENSION) || fileExtension.equals(YAML_EXTENSION)))) {
+            throw new InvalidDbPathException(WRONG_INPUT);
         }
     }
 }
