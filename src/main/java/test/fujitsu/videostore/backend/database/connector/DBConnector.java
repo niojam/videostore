@@ -12,16 +12,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static test.fujitsu.videostore.backend.database.DatabaseImpl.FILEPATH;
+
 public  abstract class DBConnector<T> {
 
     public static final String JSON_EXTENSION = "json";
     public static final String YAML_EXTENSION = "yaml";
 
-    private String filePath;
+    private String filePath = FILEPATH;
 
-    public DBConnector(String filepath) {
-        this.filePath = filepath;
-    }
 
     public List<T> readData(String entityType, TypeReference<?> outputFormatType) {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());

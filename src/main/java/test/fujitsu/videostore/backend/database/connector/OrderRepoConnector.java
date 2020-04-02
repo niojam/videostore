@@ -16,10 +16,15 @@ import java.util.Map;
 
 import static test.fujitsu.videostore.backend.database.DBTableRepository.ENTITY_TYPE_ORDER;
 
-public  class OrderRepoConnector extends DBConnector<RentOrder> {
+public class OrderRepoConnector extends DBConnector<RentOrder> {
 
-    public OrderRepoConnector(String filepath) {
-        super(filepath);
+    private static OrderRepoConnector orderRepoConnector = new OrderRepoConnector();
+
+    private OrderRepoConnector() {
+    }
+
+    public static OrderRepoConnector getInstance() {
+        return orderRepoConnector;
     }
 
     @Override
@@ -31,8 +36,7 @@ public  class OrderRepoConnector extends DBConnector<RentOrder> {
             RentOrder newOrder = new RentOrder();
             newOrder.setId((Integer) rentOrderFromDB.get("id"));
             newOrder.setOrderDate(LocalDate.parse((String) rentOrderFromDB.get("orderDate")));
-            newOrder.setCustomer(new CustomerRepository(new CustomerRepoConnector(super.getFilePath()))
-                    .findById((Integer) rentOrderFromDB.get("customer")));
+            newOrder.setCustomer(CustomerRepository.getInstance().findById((Integer) rentOrderFromDB.get("customer")));
             newOrder.setItems(readOrderItems((List<Map<String, Object>>) rentOrderFromDB.get("items")));
             allOrders.add(newOrder);
         });
@@ -43,8 +47,7 @@ public  class OrderRepoConnector extends DBConnector<RentOrder> {
         List<RentOrder.Item> orderItems = new ArrayList<>();
         rentOrderItemsFromDB.forEach(rentOrderItem -> {
             RentOrder.Item newItem = new RentOrder.Item();
-            newItem.setMovie(new MovieRepository(new MovieRepoConnector(super.getFilePath()))
-                    .findById((Integer) rentOrderItem.get("movie")));
+            newItem.setMovie(MovieRepository.getInstance().findById((Integer) rentOrderItem.get("movie")));
             newItem.setMovieType(newItem.getMovie().getType());
             newItem.setPaidByBonus((boolean) rentOrderItem.get("paidByBonus"));
             newItem.setDays((Integer) rentOrderItem.get("days"));

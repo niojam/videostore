@@ -11,8 +11,13 @@ import java.util.Map;
 import static test.fujitsu.videostore.backend.database.DBTableRepository.ENTITY_TYPE_MOVIE;
 
 public class MovieRepoConnector extends DBConnector<Movie> {
-    public MovieRepoConnector(String filepath) {
-        super(filepath);
+    private static MovieRepoConnector movieRepoConnector = new MovieRepoConnector();
+
+    private MovieRepoConnector() {
+    }
+
+    public static MovieRepoConnector getInstance() {
+        return movieRepoConnector;
     }
 
     @Override

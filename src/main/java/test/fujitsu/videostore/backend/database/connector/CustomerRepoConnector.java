@@ -12,10 +12,14 @@ import static test.fujitsu.videostore.backend.database.DBTableRepository.ENTITY_
 
 public class CustomerRepoConnector extends DBConnector<Customer> {
 
-    public CustomerRepoConnector(String filepath) {
-        super(filepath);
+    private static CustomerRepoConnector customerRepositoryConnector = new CustomerRepoConnector();
+
+    private CustomerRepoConnector() {
     }
 
+    public static CustomerRepoConnector getInstance() {
+        return customerRepositoryConnector;
+    }
 
     @Override
     public void writeData(List<Customer> writeData) {

@@ -3,6 +3,7 @@ package test.fujitsu.videostore.backend.database.domainrepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import test.fujitsu.videostore.backend.database.DBTableRepository;
 import test.fujitsu.videostore.backend.database.connector.DBConnector;
+import test.fujitsu.videostore.backend.database.connector.OrderRepoConnector;
 import test.fujitsu.videostore.backend.domain.Customer;
 import test.fujitsu.videostore.backend.domain.Movie;
 import test.fujitsu.videostore.backend.domain.RentOrder;
@@ -14,10 +15,16 @@ public class OrderRepository implements DBTableRepository<RentOrder> {
     private List<RentOrder> orderList;
     private DBConnector<RentOrder> dbConnector;
 
-    public OrderRepository(DBConnector<RentOrder> dbConnector) {
-        this.dbConnector = dbConnector;
+    private static OrderRepository orderRepository = new OrderRepository();
+
+    private OrderRepository() {
+        this.dbConnector = OrderRepoConnector.getInstance();
         orderList = this.dbConnector.readData(ENTITY_TYPE_ORDER, new TypeReference<List<RentOrder>>() {
         });
+    }
+
+    public static OrderRepository getInstance() {
+        return orderRepository;
     }
 
     @Override

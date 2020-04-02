@@ -3,6 +3,7 @@ package test.fujitsu.videostore.backend.database.domainrepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import test.fujitsu.videostore.backend.database.DBTableRepository;
 import test.fujitsu.videostore.backend.database.connector.DBConnector;
+import test.fujitsu.videostore.backend.database.connector.MovieRepoConnector;
 import test.fujitsu.videostore.backend.domain.Movie;
 
 import java.util.List;
@@ -15,9 +16,15 @@ public class MovieRepository implements DBTableRepository<Movie> {
     private TypeReference<?> type = new TypeReference<List<Movie>>() {
     };
 
-    public MovieRepository(DBConnector<Movie> dbConnector) {
-        this.dbConnector = dbConnector;
+
+    private static MovieRepository movieRepository = new MovieRepository();
+
+    private MovieRepository() {
+        this.dbConnector = MovieRepoConnector.getInstance();
         movieList = this.dbConnector.readData(ENTITY_TYPE_MOVIE, type);
+    }
+    public static MovieRepository getInstance() {
+        return movieRepository;
     }
 
 
