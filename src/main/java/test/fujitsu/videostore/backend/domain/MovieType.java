@@ -2,6 +2,10 @@ package test.fujitsu.videostore.backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import test.fujitsu.videostore.backend.reciept.price.NewRealisePrice;
+import test.fujitsu.videostore.backend.reciept.price.OldFilmPrice;
+import test.fujitsu.videostore.backend.reciept.price.PriceCalculationStrategy;
+import test.fujitsu.videostore.backend.reciept.price.RegularFilmPrice;
 
 /**
  * Movie type
@@ -9,9 +13,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public enum MovieType {
 
-    @JsonProperty("1") NEW(1, "New release"),
-    @JsonProperty("2") REGULAR(2, "Regular rental"),
-    @JsonProperty("3") OLD(3, "Old film");
+    @JsonProperty("1") NEW(1, "New release", NewRealisePrice.getInstance()),
+    @JsonProperty("2") REGULAR(2, "Regular rental", RegularFilmPrice.getInstance()),
+    @JsonProperty("3") OLD(3, "Old film", OldFilmPrice.getInstance());
 
     /**
      * Movie type representation in database
@@ -23,9 +27,15 @@ public enum MovieType {
      */
     private final String textualRepresentation;
 
-    MovieType(int databaseId, String textualRepresentation) {
+    /**
+     * Strategy for movie price calculation
+     */
+    private final PriceCalculationStrategy priceCalculationStrategy;
+
+    MovieType(int databaseId, String textualRepresentation, PriceCalculationStrategy priceCalculationStrategy) {
         this.databaseId = databaseId;
         this.textualRepresentation = textualRepresentation;
+        this.priceCalculationStrategy = priceCalculationStrategy;
     }
 
     public String getTextualRepresentation() {
@@ -34,6 +44,10 @@ public enum MovieType {
 
     public int getDatabaseId() {
         return databaseId;
+    }
+
+    public PriceCalculationStrategy getPriceCalculationStrategy() {
+        return priceCalculationStrategy;
     }
 
     @JsonCreator
