@@ -12,7 +12,6 @@ import com.vaadin.flow.router.HasUrlParameter;
 
 public abstract class ModelList<T> extends HorizontalLayout implements HasUrlParameter<String> {
 
-    private TextField filter;
 
     private Button newItem;
 
@@ -34,23 +33,7 @@ public abstract class ModelList<T> extends HorizontalLayout implements HasUrlPar
     }
 
 
-    public abstract TextField createFilter();
-
-    public Button getNewItemButton() {
-        return newItem;
-    }
-
-    public abstract void setNewItemTextAndLogic();
-
-    public void showSaveNotification(String msg) {
-        Notification.show(msg);
-    }
-
-    public void setNewMovieEnabled(boolean enabled) {
-        newItem.setEnabled(enabled);
-    }
-
-    public VerticalLayout buildVerticalLayout(Grid<T> grid) {
+    public VerticalLayout buildVerticalLayout(Grid<?> grid) {
         HorizontalLayout topLayout = createTopBar();
         VerticalLayout barAndGridLayout = new VerticalLayout();
         barAndGridLayout.add(topLayout);
@@ -61,5 +44,21 @@ public abstract class ModelList<T> extends HorizontalLayout implements HasUrlPar
         barAndGridLayout.expand(grid);
         return barAndGridLayout;
     }
+
+    public void showSaveNotification(String msg) {
+        Notification.show(msg);
+    }
+
+    public void setNewItemEnabled(boolean enabled) {
+        newItem.setEnabled(enabled);
+    }
+
+    public abstract TextField createFilter();
+
+    public Button getNewItemButton() {
+        return newItem;
+    }
+
+    public abstract void setNewItemTextAndLogic();
 
 }

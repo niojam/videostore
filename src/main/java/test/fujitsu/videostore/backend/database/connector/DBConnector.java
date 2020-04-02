@@ -12,17 +12,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class DBConnector<T> {
+public  abstract class DBConnector<T> {
 
     public static final String JSON_EXTENSION = "json";
     public static final String YAML_EXTENSION = "yaml";
-    public static final String EXCEPTION_MESSAGE = "Application supports only .json or .yaml formats";
 
     private String filePath;
 
     public DBConnector(String filepath) {
         this.filePath = filepath;
-        this.filePath = "db-examples/database.json";
     }
 
     public List<T> readData(String entityType, TypeReference<?> outputFormatType) {

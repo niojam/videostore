@@ -1,11 +1,6 @@
 package test.fujitsu.videostore.ui.customer;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -15,6 +10,7 @@ import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.Route;
 import test.fujitsu.videostore.backend.domain.Customer;
 import test.fujitsu.videostore.ui.MainLayout;
+import test.fujitsu.videostore.ui.ModelList;
 import test.fujitsu.videostore.ui.customer.components.CustomerForm;
 import test.fujitsu.videostore.ui.customer.components.CustomerGrid;
 
@@ -22,74 +18,50 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Route(value = CustomerList.VIEW_NAME, layout = MainLayout.class)
-public class CustomerList extends HorizontalLayout implements HasUrlParameter<String> {
+public class CustomerList extends ModelList<Customer> implements HasUrlParameter<String> {
 
     public static final String VIEW_NAME = "CustomerList";
+    public static final String NEW_CUSTOMER_BTN_TEXT = "New Customer";
     private CustomerGrid grid;
     private CustomerForm form;
-    private TextField filter;
 
     private ListDataProvider<Customer> dataProvider = new ListDataProvider<>(new ArrayList<>());
     private CustomerListLogic viewLogic = new CustomerListLogic(this);
-    private Button newCustomer;
 
     public CustomerList() {
         setId(VIEW_NAME);
         setSizeFull();
-        HorizontalLayout topLayout = createTopBar();
-
         grid = new CustomerGrid();
-        grid.setDataProvider(dataProvider);
         grid.asSingleSelect().addValueChangeListener(
                 event -> viewLogic.rowSelected(event.getValue()));
-
+        grid.setDataProvider(dataProvider);
         form = new CustomerForm(viewLogic);
-
-        VerticalLayout barAndGridLayout = new VerticalLayout();
-        barAndGridLayout.add(topLayout);
-        barAndGridLayout.add(grid);
-        barAndGridLayout.setFlexGrow(1, grid);
-        barAndGridLayout.setFlexGrow(0, topLayout);
-        barAndGridLayout.setSizeFull();
-        barAndGridLayout.expand(grid);
-
-        add(barAndGridLayout);
+        add(buildVerticalLayout(grid));
         add(form);
-
         viewLogic.init();
     }
 
-    public HorizontalLayout createTopBar() {
-        filter = new TextField();
+
+    @Override
+    public TextField createFilter() {
+        TextField filter = new TextField();
         filter.setId("filter");
         filter.setPlaceholder("Filter by customer name");
         filter.setValueChangeMode(ValueChangeMode.EAGER);
         filter.addValueChangeListener(event -> {
             // TODO: Implement filtering by customer name
         });
-
-        newCustomer = new Button("New Customer");
-        newCustomer.setId("new-item");
-        newCustomer.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        newCustomer.setIcon(VaadinIcon.PLUS_CIRCLE.create());
-        newCustomer.addClickListener(click -> viewLogic.newCustomer());
-
-        HorizontalLayout topLayout = new HorizontalLayout();
-        topLayout.setWidth("100%");
-        topLayout.add(filter);
-        topLayout.add(newCustomer);
-        topLayout.setVerticalComponentAlignment(Alignment.START, filter);
-        topLayout.expand(filter);
-        return topLayout;
+        return filter;
     }
 
-    public void showSaveNotification(String msg) {
-        Notification.show(msg);
+    @Override
+    public void setNewItemTextAndLogic() {
+        Button newItemBtn = getNewItemButton();
+        newItemBtn.setText(NEW_CUSTOMER_BTN_TEXT);
+        newItemBtn.addClickListener(click -> viewLogic.newCustomer());
     }
 
-    public void setNewCustomerEnabled(boolean enabled) {
-        newCustomer.setEnabled(enabled);
-    }
+
 
     public void clearSelection() {
         grid.getSelectionModel().deselectAll();

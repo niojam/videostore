@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.HtmlImport;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -73,14 +74,15 @@ public class DatabaseSelectionView extends FlexLayout {
             CurrentDatabase.set(filepath);
             getUI().get().navigate("");
         } catch (InvalidDbPathException e) {
-            Notification notification = new Notification(
-                    ERROR_NOTIFICATION_TEXT, 3000, Notification.Position.BOTTOM_CENTER);
-            notification.open();
+            showNotificationError();
+
             e.printStackTrace();
         } finally {
             selectDatabaseButton.setEnabled(true);
         }
     }
+
+
 
     private void validateInputDbPath(String filepath) throws InvalidDbPathException {
         String fileExtension = FilenameUtils.getExtension(filepath);
@@ -88,5 +90,17 @@ public class DatabaseSelectionView extends FlexLayout {
                 (fileExtension.equals(JSON_EXTENSION) || fileExtension.equals(YAML_EXTENSION)))) {
             throw new InvalidDbPathException(WRONG_INPUT);
         }
+    }
+
+
+    public void showNotificationError() {
+        Div content = new Div();
+        content.addClassName("notification-error");
+        content.setText(ERROR_NOTIFICATION_TEXT);
+
+        Notification notification = new Notification(content);
+        notification.setDuration(3000);
+        notification.setPosition(Notification.Position.BOTTOM_CENTER);
+        notification.open();
     }
 }

@@ -24,7 +24,7 @@ public class OrderListLogic {
         }
 
         repository = CurrentDatabase.get().getOrderTable();
-        view.setNewOrderEnabled(true);
+        view.setNewItemEnabled(true);
         view.setOrders(repository.getAll());
     }
 

@@ -16,7 +16,7 @@ import java.util.Map;
 
 import static test.fujitsu.videostore.backend.database.DBTableRepository.ENTITY_TYPE_ORDER;
 
-public class OrderRepoConnector extends DBConnector<RentOrder> {
+public  class OrderRepoConnector extends DBConnector<RentOrder> {
 
     public OrderRepoConnector(String filepath) {
         super(filepath);

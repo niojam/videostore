@@ -22,7 +22,7 @@ public class CustomerListLogic {
 
         customerDBTableRepository = CurrentDatabase.get().getCustomerTable();
 
-        view.setNewCustomerEnabled(true);
+        view.setNewItemEnabled(true);
         view.setCustomers(customerDBTableRepository.getAll());
     }
 

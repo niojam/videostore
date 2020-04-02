@@ -1,11 +1,14 @@
 package test.fujitsu.videostore.backend.database.domainrepository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import test.fujitsu.videostore.backend.database.connector.DBConnector;
 import test.fujitsu.videostore.backend.database.DBTableRepository;
+import test.fujitsu.videostore.backend.database.connector.DBConnector;
+import test.fujitsu.videostore.backend.domain.Customer;
+import test.fujitsu.videostore.backend.domain.Movie;
 import test.fujitsu.videostore.backend.domain.RentOrder;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class OrderRepository implements DBTableRepository<RentOrder> {
     private List<RentOrder> orderList;
@@ -57,6 +60,21 @@ public class OrderRepository implements DBTableRepository<RentOrder> {
         dbConnector.writeData(orderList);
         return order;
     }
+
+    public void removeMovies(Movie movieToRemove) {
+        orderList.forEach(order -> {
+            order.setItems(order.getItems().stream()
+                    .filter(item -> !item.getMovie().equals(movieToRemove))
+                    .collect(Collectors.toList()));
+        });
+    }
+
+    public void removeCustomers(Customer customerToRemove) {
+        orderList = orderList.stream()
+                .filter(order -> !order.getCustomer().equals(customerToRemove))
+                .collect(Collectors.toList());
+    }
+
 
     @Override
     public int generateNextId() {

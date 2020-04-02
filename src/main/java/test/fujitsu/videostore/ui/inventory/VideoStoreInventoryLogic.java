@@ -21,7 +21,7 @@ public class VideoStoreInventoryLogic {
         }
         movieDBTableRepository = CurrentDatabase.get().getMovieTable();
 
-        view.setNewMovieEnabled(true);
+        view.setNewItemEnabled(true);
         view.setMovies(movieDBTableRepository.getAll());
     }
 

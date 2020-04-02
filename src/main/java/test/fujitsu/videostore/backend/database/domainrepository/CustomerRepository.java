@@ -1,8 +1,8 @@
 package test.fujitsu.videostore.backend.database.domainrepository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import test.fujitsu.videostore.backend.database.connector.DBConnector;
 import test.fujitsu.videostore.backend.database.DBTableRepository;
+import test.fujitsu.videostore.backend.database.connector.DBConnector;
 import test.fujitsu.videostore.backend.domain.Customer;
 
 import java.util.List;
@@ -11,7 +11,8 @@ public class CustomerRepository implements DBTableRepository<Customer> {
 
     private List<Customer> customerList;
     private DBConnector<Customer> dbConnector;
-    private TypeReference<?> type = new TypeReference<List<Customer>>(){};
+    private TypeReference<?> type = new TypeReference<List<Customer>>() {
+    };
 
     public CustomerRepository(DBConnector<Customer> dbConnector) {
         this.dbConnector = dbConnector;
