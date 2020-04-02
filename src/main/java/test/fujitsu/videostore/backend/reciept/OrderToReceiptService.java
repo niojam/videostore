@@ -1,7 +1,10 @@
 package test.fujitsu.videostore.backend.reciept;
 
+import test.fujitsu.videostore.backend.database.domainrepository.CustomerRepository;
+import test.fujitsu.videostore.backend.domain.Customer;
 import test.fujitsu.videostore.backend.domain.RentOrder;
 import test.fujitsu.videostore.backend.domain.ReturnOrder;
+import test.fujitsu.videostore.backend.reciept.price.PriceCalculationStrategy;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -13,6 +16,8 @@ import java.util.List;
  * Note! All calculations should be in another place. Here we just setting already calculated data. Feel free to refactor.
  */
 public class OrderToReceiptService {
+
+    public static final int NEW_REALISE_BONUS_PRICE = 25;
 
     /**
      * Converts rent order to printable receipt
@@ -30,30 +35,38 @@ public class OrderToReceiptService {
         List<PrintableOrderReceipt.Item> itemList = new ArrayList<>();
         printableOrderReceipt.setOrderItems(itemList);
 
+        Integer orderBonusPoints = 0;
+        Integer bonusToPay = 0;
+        BigDecimal orderTotalPrice = BigDecimal.ZERO;
+        Customer customer = order.getCustomer();
+        Integer customerBonusPoints = customer.getPoints();
         for (RentOrder.Item orderItem : order.getItems()) {
             PrintableOrderReceipt.Item item = new PrintableOrderReceipt.Item();
             item.setDays(orderItem.getDays());
             item.setMovieName(orderItem.getMovie().getName());
             item.setMovieType(orderItem.getMovieType());
 
-            // TODO: Add calculated data
-            //  RentOrder.Item::getMovieType,
-            //  PrintableOrderReceipt.Item::getDays,
-            //  PrintableOrderReceipt.Item::getDays::isPaidByBonus
             if (orderItem.isPaidByBonus()) {
-                item.setPaidBonus(1);
+                bonusToPay += NEW_REALISE_BONUS_PRICE * item.getDays();
+                item.setPaidBonus(bonusToPay);
             } else {
-                item.setPaidMoney(BigDecimal.ONE);
+                PriceCalculationStrategy calculationStrategy = item.getMovieType().getPriceCalculationStrategy();
+                BigDecimal itemPrice = calculationStrategy.getPrice(item.getDays());
+                orderTotalPrice = orderTotalPrice
+                        .add(itemPrice);
+                item.setPaidMoney(itemPrice);
+                customerBonusPoints += calculationStrategy.getBonus(); // Add bonus
             }
 
             itemList.add(item);
         }
 
-        // TODO: Set here calculated total price of renting order
-        printableOrderReceipt.setTotalPrice(BigDecimal.ONE);
+        printableOrderReceipt.setTotalPrice(orderTotalPrice);
 
-        // TODO: Set how many bonus points remaining for customer
-        printableOrderReceipt.setRemainingBonusPoints(0);
+        int remainingBonusPoints = customerBonusPoints - bonusToPay;
+        printableOrderReceipt.setRemainingBonusPoints(remainingBonusPoints);
+        customer.setPoints(remainingBonusPoints);
+        CustomerRepository.getInstance().createOrUpdate(customer);
 
         return printableOrderReceipt;
     }

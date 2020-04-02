@@ -15,8 +15,11 @@ import test.fujitsu.videostore.backend.domain.RentOrder;
 import test.fujitsu.videostore.ui.database.CurrentDatabase;
 import test.fujitsu.videostore.ui.order.OrderListLogic;
 
+import static test.fujitsu.videostore.backend.reciept.OrderToReceiptService.NEW_REALISE_BONUS_PRICE;
+
 public class OrderForm extends Div {
 
+    public static final String NOW_ENOUGH_BONUS_POINTS_NOTIFICATION = "Now enough bonus points";
     private VerticalLayout content;
 
     private ComboBox<Customer> customerComboBox;
@@ -85,9 +88,13 @@ public class OrderForm extends Div {
                 Notification.show(firstError.getErrorMessage(), 5000, Notification.Position.MIDDLE);
                 return;
             }
-
-            // TODO: Validate that user have enough bonus points
             binder.writeBeanIfValid(currentOrder);
+            if (currentOrder.getItems().stream().filter(RentOrder.Item::isPaidByBonus)
+                    .map(item -> item.getDays() * NEW_REALISE_BONUS_PRICE)
+                    .reduce(0, Integer::sum) > currentOrder.getCustomer().getPoints()) {
+                Notification.show(NOW_ENOUGH_BONUS_POINTS_NOTIFICATION, 3000, Notification.Position.MIDDLE);
+                return;
+            }
             new ReceiptWindow(viewLogic.getOrderToReceiptService().convertRentOrderToReceipt(currentOrder).print(), currentOrder.isNewObject(), () -> viewLogic.saveOrder(currentOrder));
         });
 
