@@ -24,6 +24,7 @@ import test.fujitsu.videostore.ui.database.CurrentDatabase;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class OrderedVideos extends VerticalLayout implements HasValue<AbstractField.ComponentValueChangeEvent<OrderedVideos, List<RentOrder.Item>>, List<RentOrder.Item>> {
 
@@ -49,8 +50,9 @@ public class OrderedVideos extends VerticalLayout implements HasValue<AbstractFi
         movieComboBox.setWidth("100%");
         movieComboBox.setRequired(true);
         movieComboBox.setItemLabelGenerator(Movie::getName);
-        // TODO: List only available movies
-        movieComboBox.setItems(CurrentDatabase.get().getMovieTable().getAll());
+        movieComboBox.setItems(CurrentDatabase.get().getMovieTable().getAll()
+                .stream().filter(movie -> movie.getStockCount() > 0)
+                .collect(Collectors.toList()));
         addFormBinder.forField(movieComboBox)
                 .asRequired()
                 .bind("movie");
@@ -63,7 +65,7 @@ public class OrderedVideos extends VerticalLayout implements HasValue<AbstractFi
         addFormBinder.forField(numberOfDays)
                 .asRequired()
                 .withConverter(new StringToIntegerConverter("Invalid number of days"))
-                // TODO: Validation here. Number of days should be more than zero.
+                .withValidator(daysNum -> daysNum > 0, "Days should be more than zero")
                 .bind("days");
 
         add(numberOfDays);
