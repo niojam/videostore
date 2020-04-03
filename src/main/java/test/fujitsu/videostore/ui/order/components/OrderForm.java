@@ -153,11 +153,9 @@ public class OrderForm extends Div {
         orderDate.setVisible(!isNew);
         orderDate.setReadOnly(true);
 
-        // TODO: returnButton should be not enabled if all movies were returned from this order
-        returnButton.setEnabled(true);
+        returnButton.setEnabled(viewLogic.canBeReturned(order));
 
-        // TODO: Delete button should be disabled during new order creation or if order there is not all movies returned.
-        delete.setEnabled(true);
+        delete.setEnabled(!viewLogic.canBeDeleted(order));
     }
 
     private void setSaveButtonCaption(boolean isReadOnly) {

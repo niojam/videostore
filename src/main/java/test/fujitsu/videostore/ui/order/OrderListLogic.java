@@ -141,6 +141,22 @@ public class OrderListLogic {
                 .collect(Collectors.toList());
     }
 
+    public boolean canBeDeleted(RentOrder order) {
+        if (order.getItems() == null) {
+            return false;
+        }
+        return order.getId() == -1 || order.getItems().stream()
+                .anyMatch(item -> item.getReturnedDay() == null);
+    }
+
+    public boolean canBeReturned(RentOrder order) {
+        if (order.getItems() == null) {
+            return false;
+        }
+        return order.getItems().stream()
+                .anyMatch(item -> item.getReturnedDay() == null) & order.getId() != -1;
+    }
+
     public DBTableRepository<RentOrder> getRepository() {
         return repository;
     }
