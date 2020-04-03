@@ -2,6 +2,10 @@ package test.fujitsu.videostore.ui.order;
 
 import com.vaadin.flow.component.UI;
 import test.fujitsu.videostore.backend.database.DBTableRepository;
+import test.fujitsu.videostore.backend.database.domainrepository.CustomerRepository;
+import test.fujitsu.videostore.backend.database.domainrepository.MovieRepository;
+import test.fujitsu.videostore.backend.domain.Customer;
+import test.fujitsu.videostore.backend.domain.Movie;
 import test.fujitsu.videostore.backend.domain.RentOrder;
 import test.fujitsu.videostore.backend.reciept.OrderToReceiptService;
 import test.fujitsu.videostore.ui.database.CurrentDatabase;
@@ -66,6 +70,7 @@ public class OrderListLogic {
         boolean isNew = order.isNewObject();
 
         RentOrder updatedObject = repository.createOrUpdate(order);
+        updateOrderMovieStock(order);
 
         if (isNew) {
             view.addOrder(updatedObject);
@@ -111,6 +116,19 @@ public class OrderListLogic {
 
     public OrderToReceiptService getOrderToReceiptService() {
         return orderToReceiptService;
+    }
+
+    public void updateOrderMovieStock(RentOrder order) {
+        order.getItems().forEach(item -> {
+            Movie rentMovie = item.getMovie();
+            rentMovie.setStockCount(rentMovie.getStockCount() - 1);
+            MovieRepository.getInstance().createOrUpdate(rentMovie);
+        });
+    }
+
+    public void setCustomerBonuses(Customer customer, Integer remainingBonus) {
+        customer.setPoints(remainingBonus);
+        CustomerRepository.getInstance().createOrUpdate(customer);
     }
 
     public DBTableRepository<RentOrder> getRepository() {

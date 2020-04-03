@@ -1,6 +1,5 @@
 package test.fujitsu.videostore.backend.reciept;
 
-import test.fujitsu.videostore.backend.database.domainrepository.CustomerRepository;
 import test.fujitsu.videostore.backend.domain.Customer;
 import test.fujitsu.videostore.backend.domain.RentOrder;
 import test.fujitsu.videostore.backend.domain.ReturnOrder;
@@ -35,8 +34,7 @@ public class OrderToReceiptService {
         List<PrintableOrderReceipt.Item> itemList = new ArrayList<>();
         printableOrderReceipt.setOrderItems(itemList);
 
-        Integer orderBonusPoints = 0;
-        Integer bonusToPay = 0;
+        int bonusToPay = 0;
         BigDecimal orderTotalPrice = BigDecimal.ZERO;
         Customer customer = order.getCustomer();
         Integer customerBonusPoints = customer.getPoints();
@@ -65,9 +63,6 @@ public class OrderToReceiptService {
 
         int remainingBonusPoints = customerBonusPoints - bonusToPay;
         printableOrderReceipt.setRemainingBonusPoints(remainingBonusPoints);
-        customer.setPoints(remainingBonusPoints);
-        CustomerRepository.getInstance().createOrUpdate(customer);
-
         return printableOrderReceipt;
     }
 

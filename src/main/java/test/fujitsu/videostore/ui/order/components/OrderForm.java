@@ -12,6 +12,7 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.ValidationResult;
 import test.fujitsu.videostore.backend.domain.Customer;
 import test.fujitsu.videostore.backend.domain.RentOrder;
+import test.fujitsu.videostore.backend.reciept.PrintableOrderReceipt;
 import test.fujitsu.videostore.ui.database.CurrentDatabase;
 import test.fujitsu.videostore.ui.order.OrderListLogic;
 
@@ -95,7 +96,11 @@ public class OrderForm extends Div {
                 Notification.show(NOW_ENOUGH_BONUS_POINTS_NOTIFICATION, 3000, Notification.Position.MIDDLE);
                 return;
             }
-            new ReceiptWindow(viewLogic.getOrderToReceiptService().convertRentOrderToReceipt(currentOrder).print(), currentOrder.isNewObject(), () -> viewLogic.saveOrder(currentOrder));
+            PrintableOrderReceipt printableOrderReceipt = viewLogic.getOrderToReceiptService().convertRentOrderToReceipt(currentOrder);
+            new ReceiptWindow(printableOrderReceipt.print(), currentOrder.isNewObject(), () -> {
+                viewLogic.saveOrder(currentOrder);
+                viewLogic.setCustomerBonuses(currentOrder.getCustomer(), printableOrderReceipt.getRemainingBonusPoints());
+            });
         });
 
         cancel = new Button("Cancel");
