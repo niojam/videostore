@@ -71,11 +71,9 @@ public class PrintableReturnReceipt implements PrintableReceipt {
         StringBuilder receipt = new StringBuilder()
                 .append("ID: ").append(getOrderId()).append(" (Return)")
                 .append("\n")
-                // TODO: Format rent date in dd-MM-YY format
-                .append("Rent date: ").append(getRentDate().toString())
+                .append("Rent date: ").append(getRentDate().format(DATE_TIME_FORMATTER))
                 .append("\n").append("Customer: ").append(getCustomerName())
-                // TODO: Format return date in dd-MM-YY format
-                .append("\nReturn date: ").append(getReturnDate().toString())
+                .append("\nReturn date: ").append(getReturnDate().format(DATE_TIME_FORMATTER))
                 .append("\n");
 
         returnedItems.forEach(item -> receipt.append(item.print()));
