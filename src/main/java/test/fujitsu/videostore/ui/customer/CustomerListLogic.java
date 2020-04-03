@@ -2,7 +2,9 @@ package test.fujitsu.videostore.ui.customer;
 
 import com.vaadin.flow.component.UI;
 import test.fujitsu.videostore.backend.database.DBTableRepository;
+import test.fujitsu.videostore.backend.database.domainrepository.OrderRepository;
 import test.fujitsu.videostore.backend.domain.Customer;
+import test.fujitsu.videostore.backend.domain.RentOrder;
 import test.fujitsu.videostore.ui.database.CurrentDatabase;
 
 import java.util.List;
@@ -81,11 +83,20 @@ public class CustomerListLogic {
 
     public void deleteCustomer(Customer customer) {
         customerDBTableRepository.remove(customer);
+        cleanCustomerOrders(customer);
 
         view.clearSelection();
         view.removeCustomer(customer);
         setFragmentParameter("");
         view.showSaveNotification(customer.getName() + " removed");
+    }
+
+    private void cleanCustomerOrders(Customer customer) {
+        OrderRepository orderRepository = OrderRepository.getInstance();
+        List<RentOrder> ordersToDelete = orderRepository.getAll().stream()
+                .filter(order -> order.getCustomer().getId() == customer.getId())
+                .collect(Collectors.toList());
+        ordersToDelete.forEach(orderRepository::remove);
     }
 
     public void editCustomer(Customer customer) {
@@ -101,6 +112,13 @@ public class CustomerListLogic {
         setFragmentParameter("new");
         view.clearSelection();
         view.editCustomer(new Customer());
+    }
+
+    public boolean canBeDeleted(Customer customer) {
+        return OrderRepository.getInstance().getAll().stream()
+                .anyMatch(order -> order.getCustomer().getId() == customer.getId()
+                        & order.getItems().stream().anyMatch((item -> item.getReturnedDay() == null)))
+                        || customer.getId() == -1;
     }
 
     public List<Customer> filterByName(String inputName) {

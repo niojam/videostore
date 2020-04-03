@@ -108,6 +108,6 @@ public class CustomerForm extends Div {
         binder.readBean(customer);
 
         // TODO: Customer deletion button should be inactive if it’s new customer creation or customer have active rent’s. If customer deleted, then all his already inactive rent’s should be deleted also.
-        delete.setEnabled(true);
+        delete.setEnabled(!viewLogic.canBeDeleted(customer));
     }
 }

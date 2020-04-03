@@ -10,6 +10,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.dom.ElementFactory;
 import test.fujitsu.videostore.backend.database.DBTableRepository;
+import test.fujitsu.videostore.backend.database.domainrepository.MovieRepository;
+import test.fujitsu.videostore.backend.domain.Movie;
 import test.fujitsu.videostore.backend.domain.RentOrder;
 import test.fujitsu.videostore.backend.domain.ReturnOrder;
 import test.fujitsu.videostore.backend.reciept.OrderToReceiptService;
@@ -116,7 +118,12 @@ public class ReturnMovieWindow extends Dialog {
             returnedItems.stream()
                     .filter(returnedItem -> returnedItem.getMovie().equals(rentedItem.getMovie()))
                     .findAny()
-                    .ifPresent(movieToReturn -> movieToReturn.setReturnedDay(returnOrder.getReturnDate()));
+                    .ifPresent(movieToReturn -> {
+                        movieToReturn.setReturnedDay(returnOrder.getReturnDate());
+                        Movie movie = MovieRepository.getInstance().findById(movieToReturn.getMovie().getId());
+                        movie.setStockCount(movie.getStockCount() + 1);
+                        MovieRepository.getInstance().createOrUpdate(movie);
+                    });
         }
 
         repository.createOrUpdate(currentOrder);
