@@ -49,7 +49,7 @@ public class CustomerList extends ModelList<Customer> implements HasUrlParameter
         filter.setPlaceholder("Filter by customer name");
         filter.setValueChangeMode(ValueChangeMode.EAGER);
         filter.addValueChangeListener(event -> {
-            // TODO: Implement filtering by customer name
+            setCustomers(viewLogic.filterByName(event.getValue().toLowerCase()));
         });
         return filter;
     }

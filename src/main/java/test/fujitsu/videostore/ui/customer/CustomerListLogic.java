@@ -5,6 +5,9 @@ import test.fujitsu.videostore.backend.database.DBTableRepository;
 import test.fujitsu.videostore.backend.domain.Customer;
 import test.fujitsu.videostore.ui.database.CurrentDatabase;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class CustomerListLogic {
 
     private CustomerList view;
@@ -98,6 +101,12 @@ public class CustomerListLogic {
         setFragmentParameter("new");
         view.clearSelection();
         view.editCustomer(new Customer());
+    }
+
+    public List<Customer> filterByName(String inputName) {
+        return customerDBTableRepository.getAll().stream()
+                .filter(customer -> customer.getName().toLowerCase().contains(inputName))
+                .collect(Collectors.toList());
     }
 
     public void rowSelected(Customer customer) {
