@@ -124,8 +124,9 @@ public class MovieForm extends Div {
         currentMovie = movie;
         binder.readBean(movie);
 
+
         // TODO: Delete movie button should be inactive if it’s new movie creation or it was rented at least one time.
-        delete.setEnabled(true);
+        delete.setEnabled(!viewLogic.canBeDeleted(movie));
     }
 
     private static class StockCountConverter extends StringToIntegerConverter {

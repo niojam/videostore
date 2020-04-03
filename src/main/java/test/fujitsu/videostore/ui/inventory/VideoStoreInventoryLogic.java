@@ -2,6 +2,7 @@ package test.fujitsu.videostore.ui.inventory;
 
 import com.vaadin.flow.component.UI;
 import test.fujitsu.videostore.backend.database.DBTableRepository;
+import test.fujitsu.videostore.backend.database.domainrepository.OrderRepository;
 import test.fujitsu.videostore.backend.domain.Movie;
 import test.fujitsu.videostore.ui.database.CurrentDatabase;
 
@@ -112,6 +113,12 @@ public class VideoStoreInventoryLogic {
         setFragmentParameter("new");
     }
 
+
+    public boolean canBeDeleted(Movie movie) {
+        return OrderRepository.getInstance().getAll().stream()
+                .anyMatch(order -> order.getItems().stream()
+                        .anyMatch(orderItem -> orderItem.getMovie().equals(movie))) || movie.getId() == -1;
+    }
 
     public List<Movie> filterByName(String movieName) {
         return movieDBTableRepository.getAll().stream()
