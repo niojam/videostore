@@ -56,7 +56,7 @@ public class OrderList extends ModelList<RentOrder> implements HasUrlParameter<S
         filter.setPlaceholder("Filter by ID or Customer name");
         filter.setValueChangeMode(ValueChangeMode.EAGER);
         filter.addValueChangeListener(event -> {
-            //TODO: Implement filtering by id and customer name
+            setOrders(viewLogic.filterByIdAndCustomer(event.getValue().toLowerCase()));
         });
         return filter;
     }

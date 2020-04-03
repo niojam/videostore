@@ -10,6 +10,9 @@ import test.fujitsu.videostore.backend.domain.RentOrder;
 import test.fujitsu.videostore.backend.reciept.OrderToReceiptService;
 import test.fujitsu.videostore.ui.database.CurrentDatabase;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class OrderListLogic {
 
     private OrderList view;
@@ -129,6 +132,13 @@ public class OrderListLogic {
     public void setCustomerBonuses(Customer customer, Integer remainingBonus) {
         customer.setPoints(remainingBonus);
         CustomerRepository.getInstance().createOrUpdate(customer);
+    }
+
+    public List<RentOrder> filterByIdAndCustomer(String input) {
+        return repository.getAll().stream().filter(order -> order.getCustomer().getName().toLowerCase().startsWith(input)
+                || order.getCustomer().getName().toLowerCase().contains(input)
+                || Integer.toString(order.getId()).equals(input))
+                .collect(Collectors.toList());
     }
 
     public DBTableRepository<RentOrder> getRepository() {
