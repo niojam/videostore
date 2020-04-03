@@ -3,7 +3,6 @@ package test.fujitsu.videostore.backend.database;
 /**
  * Database Factory.
  * <p>
- * TODO: Should be re-implemented with your file database. Current implementation is just demo for UI testing.
  */
 public class DatabaseFactory {
 

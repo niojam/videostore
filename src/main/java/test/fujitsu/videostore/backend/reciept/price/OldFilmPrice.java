@@ -17,6 +17,7 @@ public class OldFilmPrice implements PriceCalculationStrategy {
 
     @Override
     public BigDecimal getPrice(Integer daysRented) {
+        if (daysRented <= 0) return BigDecimal.ZERO;
         return daysRented > DAYS_WITH_BASIC_PRICE ? BASIC_PRICE
                 .add(BASIC_PRICE.multiply(BigDecimal.valueOf(daysRented - DAYS_WITH_BASIC_PRICE))) : BASIC_PRICE;
     }

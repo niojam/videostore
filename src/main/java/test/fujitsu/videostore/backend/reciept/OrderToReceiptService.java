@@ -6,6 +6,8 @@ import test.fujitsu.videostore.backend.domain.ReturnOrder;
 import test.fujitsu.videostore.backend.reciept.price.PriceCalculationStrategy;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,24 +83,22 @@ public class OrderToReceiptService {
         receipt.setReturnDate(order.getReturnDate());
 
         List<PrintableReturnReceipt.Item> returnedItems = new ArrayList<>();
+        BigDecimal totalCharge = BigDecimal.ZERO;
         if (order.getItems() != null) {
+            LocalDate orderDate = order.getReturnDate();
             for (RentOrder.Item rentedItem : order.getItems()) {
                 PrintableReturnReceipt.Item item = new PrintableReturnReceipt.Item();
                 item.setMovieName(rentedItem.getMovie().getName());
                 item.setMovieType(rentedItem.getMovieType());
-                // TODO: Set calculated data how much later rented movie was returned
-                item.setExtraDays(0);
-                // TODO: Set calculated data how much it will cost extra days
-                item.setExtraPrice(BigDecimal.ZERO);
-
+                int daysInRent = (int) ChronoUnit.DAYS.between(orderDate, LocalDate.now());
+                item.setExtraDays(daysInRent <= rentedItem.getDays() ? 0: daysInRent - rentedItem.getDays());
+                item.setExtraPrice(rentedItem.getMovieType().getPriceCalculationStrategy().getPrice(item.getExtraDays()));
+                totalCharge  = totalCharge.add(item.getExtraPrice());
                 returnedItems.add(item);
             }
         }
         receipt.setReturnedItems(returnedItems);
-
-        // TODO: Set calculated total extra charge for all movies
-        receipt.setTotalCharge(BigDecimal.ZERO);
-
+        receipt.setTotalCharge(totalCharge);
         return receipt;
     }
 
