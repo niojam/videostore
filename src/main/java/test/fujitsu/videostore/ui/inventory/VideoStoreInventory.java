@@ -57,7 +57,7 @@ public class VideoStoreInventory extends ModelList<Movie>
         filter.setPlaceholder("Filter by name");
         filter.setValueChangeMode(ValueChangeMode.EAGER);
         filter.addValueChangeListener(event -> {
-            // TODO: Implement filtering by movie name
+           setMovies(viewLogic.filterByName(event.getValue().toLowerCase()));
         });
         return filter;
     }

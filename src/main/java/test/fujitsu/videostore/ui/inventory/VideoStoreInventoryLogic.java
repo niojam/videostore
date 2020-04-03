@@ -5,6 +5,9 @@ import test.fujitsu.videostore.backend.database.DBTableRepository;
 import test.fujitsu.videostore.backend.domain.Movie;
 import test.fujitsu.videostore.ui.database.CurrentDatabase;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class VideoStoreInventoryLogic {
 
     private VideoStoreInventory view;
@@ -107,6 +110,13 @@ public class VideoStoreInventoryLogic {
         view.editMovie(new Movie());
         view.clearSelection();
         setFragmentParameter("new");
+    }
+
+
+    public List<Movie> filterByName(String movieName) {
+        return movieDBTableRepository.getAll().stream()
+                .filter(movie -> movie.getName().toLowerCase().startsWith(movieName))
+                .collect(Collectors.toList());
     }
 
     public void rowSelected(Movie movie) {
