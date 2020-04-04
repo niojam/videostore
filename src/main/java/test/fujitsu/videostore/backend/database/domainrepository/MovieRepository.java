@@ -6,11 +6,13 @@ import test.fujitsu.videostore.backend.database.connector.DBConnector;
 import test.fujitsu.videostore.backend.database.connector.MovieRepoConnector;
 import test.fujitsu.videostore.backend.domain.Movie;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MovieRepository implements DBTableRepository<Movie> {
 
-
+    private static AtomicInteger uniqueId;
     private List<Movie> movieList;
     private DBConnector<Movie> dbConnector;
     private TypeReference<?> type = new TypeReference<List<Movie>>() {
@@ -22,7 +24,12 @@ public class MovieRepository implements DBTableRepository<Movie> {
     private MovieRepository() {
         this.dbConnector = MovieRepoConnector.getInstance();
         movieList = this.dbConnector.readData(ENTITY_TYPE_MOVIE, type);
+        if (uniqueId == null) {
+            uniqueId = new AtomicInteger(movieList.stream()
+                    .max(Comparator.comparing(Movie::getId)).orElse(new Movie()).getId() + 1);
+        }
     }
+
     public static MovieRepository getInstance() {
         return movieRepository;
     }
@@ -71,6 +78,6 @@ public class MovieRepository implements DBTableRepository<Movie> {
 
     @Override
     public int generateNextId() {
-        return movieList.size() + 1;
+        return uniqueId.getAndIncrement();
     }
 }

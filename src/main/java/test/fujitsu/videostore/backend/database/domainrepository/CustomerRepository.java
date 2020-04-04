@@ -6,10 +6,13 @@ import test.fujitsu.videostore.backend.database.connector.CustomerRepoConnector;
 import test.fujitsu.videostore.backend.database.connector.DBConnector;
 import test.fujitsu.videostore.backend.domain.Customer;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CustomerRepository implements DBTableRepository<Customer> {
 
+    private static AtomicInteger uniqueId;
     private List<Customer> customerList;
     private DBConnector<Customer> dbConnector;
     private TypeReference<?> type = new TypeReference<List<Customer>>() {
@@ -19,14 +22,16 @@ public class CustomerRepository implements DBTableRepository<Customer> {
 
     private CustomerRepository() {
         this.dbConnector = CustomerRepoConnector.getInstance();
-        customerList =  this.dbConnector.readData(ENTITY_TYPE_CUSTOMER, type);
+        customerList = this.dbConnector.readData(ENTITY_TYPE_CUSTOMER, type);
+        if (uniqueId == null) {
+            uniqueId = new AtomicInteger(customerList.stream()
+                    .max(Comparator.comparing(Customer::getId)).orElse(new Customer()).getId() + 1);
+        }
     }
 
     public static CustomerRepository getInstance() {
         return customerRepository;
     }
-
-
 
 
     @Override
@@ -71,7 +76,7 @@ public class CustomerRepository implements DBTableRepository<Customer> {
 
     @Override
     public int generateNextId() {
-        return customerList.size() + 1;
+        return uniqueId.getAndIncrement();
     }
 }
 

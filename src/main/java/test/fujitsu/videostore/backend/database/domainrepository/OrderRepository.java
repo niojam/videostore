@@ -8,10 +8,14 @@ import test.fujitsu.videostore.backend.domain.Customer;
 import test.fujitsu.videostore.backend.domain.Movie;
 import test.fujitsu.videostore.backend.domain.RentOrder;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class OrderRepository implements DBTableRepository<RentOrder> {
+
+    private static AtomicInteger uniqueId;
     private List<RentOrder> orderList;
     private DBConnector<RentOrder> dbConnector;
 
@@ -21,6 +25,10 @@ public class OrderRepository implements DBTableRepository<RentOrder> {
         this.dbConnector = OrderRepoConnector.getInstance();
         orderList = this.dbConnector.readData(ENTITY_TYPE_ORDER, new TypeReference<List<RentOrder>>() {
         });
+        if (uniqueId == null) {
+            uniqueId = new AtomicInteger(orderList.stream()
+                    .max(Comparator.comparing(RentOrder::getId)).orElse(new RentOrder()).getId() + 1);
+        }
     }
 
     public static OrderRepository getInstance() {
@@ -85,6 +93,6 @@ public class OrderRepository implements DBTableRepository<RentOrder> {
 
     @Override
     public int generateNextId() {
-        return orderList.size() + 1;
+        return uniqueId.getAndIncrement();
     }
 }
