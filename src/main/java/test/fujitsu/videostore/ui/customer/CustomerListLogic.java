@@ -2,6 +2,7 @@ package test.fujitsu.videostore.ui.customer;
 
 import com.vaadin.flow.component.UI;
 import test.fujitsu.videostore.backend.database.DBTableRepository;
+import test.fujitsu.videostore.backend.database.domainrepository.CustomerRepository;
 import test.fujitsu.videostore.backend.database.domainrepository.OrderRepository;
 import test.fujitsu.videostore.backend.domain.Customer;
 import test.fujitsu.videostore.backend.domain.RentOrder;
@@ -118,13 +119,23 @@ public class CustomerListLogic {
         return OrderRepository.getInstance().getAll().stream()
                 .anyMatch(order -> order.getCustomer().getId() == customer.getId()
                         & order.getItems().stream().anyMatch((item -> item.getReturnedDay() == null)))
-                        || customer.getId() == -1;
+                || customer.getId() == -1;
     }
 
     public List<Customer> filterByName(String inputName) {
         return customerDBTableRepository.getAll().stream()
                 .filter(customer -> customer.getName().toLowerCase().contains(inputName))
                 .collect(Collectors.toList());
+    }
+
+    public boolean validateCustomer(Customer customerToValidate) {
+        return customerToValidate.getName() == null || customerToValidate.getName().equals("")
+                || customerToValidate.getPoints() < 0;
+    }
+
+    public boolean checkNameAppearance(String name) {
+        return CustomerRepository.getInstance().getAll().stream()
+                .anyMatch(customer -> customer.getName().equals(name));
     }
 
     public void rowSelected(Customer customer) {
