@@ -4,6 +4,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
@@ -17,6 +18,7 @@ import test.fujitsu.videostore.ui.inventory.VideoStoreInventoryLogic;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Movie form
@@ -73,8 +75,10 @@ public class MovieForm extends Div {
         binder.forField(name)
                 .bind("name");
         binder.forField(type)
+                .withValidator(Objects::nonNull, "Please Select Movie Type")
                 .bind("type");
         binder.forField(stockCount).withConverter(new StockCountConverter())
+                .withValidator(count -> count >= 0, "Movie stock count cannot be negative")
                 .bind("stockCount");
 
         // enable/disable save button while editing
@@ -90,8 +94,11 @@ public class MovieForm extends Div {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         save.addClickListener(event -> {
             if (currentMovie != null) {
-                // TODO: Validation for movie name, validate that movie type is selected
                 binder.writeBeanIfValid(currentMovie);
+                if (currentMovie.getName() == null || currentMovie.getName().equals("")) {
+                    Notification.show("Please insert Movie name", 3000, Notification.Position.MIDDLE);
+                    return;
+                }
                 viewLogic.saveMovie(currentMovie);
             }
         });
@@ -103,7 +110,6 @@ public class MovieForm extends Div {
         getElement()
                 .addEventListener("keydown", event -> viewLogic.cancelMovie())
                 .setFilter("event.key == 'Escape'");
-
         delete = new Button("Delete");
         delete.setId("delete");
         delete.setWidth("100%");
