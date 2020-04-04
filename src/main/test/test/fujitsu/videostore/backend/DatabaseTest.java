@@ -17,6 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DatabaseTest {
 
+    public static final String EXAMPLE_PATH_DATABASE_JSON = "db-examples/database.json";
+    public static final String EXAMPLES_PATH_DATABASE_YAML = "db-examples/database.yaml";
     private DBTableRepository<Customer> customerTableRepositoryJson;
     private DBTableRepository<Movie> movieTableRepositoryJson;
     private DBTableRepository<RentOrder> rentOrderTableRepositoryJson;
@@ -28,8 +30,8 @@ public class DatabaseTest {
 
     @BeforeEach
     public void SetUp() {
-        Database jsonDatabase = DatabaseFactory.from("db-examples/database.json");
-        Database yamlDatabase = DatabaseFactory.from("db-examples/database.yaml");
+        Database jsonDatabase = DatabaseFactory.from(EXAMPLE_PATH_DATABASE_JSON);
+        Database yamlDatabase = DatabaseFactory.from(EXAMPLES_PATH_DATABASE_YAML);
 
         customerTableRepositoryJson = jsonDatabase.getCustomerTable();
         movieTableRepositoryJson = jsonDatabase.getMovieTable();
@@ -144,8 +146,8 @@ public class DatabaseTest {
 
         @Test
         public void removeMovieFromDB() {
-          removeMovieFromDB(movieTableRepositoryJson);
-          removeMovieFromDB(movieTableRepositoryYaml);
+            removeMovieFromDB(movieTableRepositoryJson);
+            removeMovieFromDB(movieTableRepositoryYaml);
         }
 
         private void removeMovieFromDB(DBTableRepository<Movie> movieTableRepository) {
