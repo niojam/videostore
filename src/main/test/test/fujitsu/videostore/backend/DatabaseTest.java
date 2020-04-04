@@ -128,6 +128,7 @@ public class DatabaseTest {
             assertEquals(MOVIES_INITIAL_COUNT, movieTableRepository.getAll().size());
         }
 
+
         @Test
         public void addNewMovieToDB() {
             addNewMovieToDB(movieTableRepositoryYaml);
