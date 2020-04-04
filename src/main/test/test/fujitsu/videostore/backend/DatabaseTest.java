@@ -17,8 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DatabaseTest {
 
-    private Database jsonDatabase;
-    private Database yamlDatabase;
     private DBTableRepository<Customer> customerTableRepositoryJson;
     private DBTableRepository<Movie> movieTableRepositoryJson;
     private DBTableRepository<RentOrder> rentOrderTableRepositoryJson;
@@ -30,8 +28,8 @@ public class DatabaseTest {
 
     @BeforeEach
     public void SetUp() {
-        jsonDatabase = DatabaseFactory.from("db-examples/database.json");
-        yamlDatabase = DatabaseFactory.from("db-examples/database.yaml");
+        Database jsonDatabase = DatabaseFactory.from("db-examples/database.json");
+        Database yamlDatabase = DatabaseFactory.from("db-examples/database.yaml");
 
         customerTableRepositoryJson = jsonDatabase.getCustomerTable();
         movieTableRepositoryJson = jsonDatabase.getMovieTable();
@@ -84,7 +82,7 @@ public class DatabaseTest {
             removeCustomer(customerTableRepositoryJson);
         }
 
-        public void removeCustomer(DBTableRepository<Customer> customerTableRepository) {
+        private void removeCustomer(DBTableRepository<Customer> customerTableRepository) {
             Customer newCustomer = new Customer();
             newCustomer.setPoints(100);
             newCustomer.setName(NEW_CUSTOMER_NAME);
@@ -102,7 +100,7 @@ public class DatabaseTest {
             getCustomerById(customerTableRepositoryYaml);
         }
 
-        public void getCustomerById(DBTableRepository<Customer> customerTableRepository) {
+        private void getCustomerById(DBTableRepository<Customer> customerTableRepository) {
             String nameFromExampleDB = "Maria Kusk";
             Customer customer = customerTableRepository.findById(1);
             assertEquals(nameFromExampleDB, customer.getName());
@@ -118,40 +116,61 @@ public class DatabaseTest {
 
         @Test
         public void getAllMoviesFromDB() {
-            assertEquals(12, movieTableRepositoryJson.getAll().size());
+            getAllMoviesFromDB(movieTableRepositoryJson);
+            getAllMoviesFromDB(movieTableRepositoryYaml);
+        }
+
+        private void getAllMoviesFromDB(DBTableRepository<Movie> movieTableRepository) {
+            assertEquals(12, movieTableRepository.getAll().size());
+            assertEquals(12, movieTableRepository.getAll().size());
         }
 
         @Test
         public void addNewMovieToDB() {
-            int sizeBeforeAdding = movieTableRepositoryJson.getAll().size();
+            addNewMovieToDB(movieTableRepositoryYaml);
+            addNewMovieToDB(movieTableRepositoryJson);
+        }
+
+        private void addNewMovieToDB(DBTableRepository<Movie> movieTableRepository) {
+            int sizeBeforeAdding = movieTableRepository.getAll().size();
             Movie newMovie = new Movie();
             newMovie.setStockCount(10);
             newMovie.setName(NEW_MOVIE_NAME);
             newMovie.setType(MovieType.NEW);
-            Movie movie = movieTableRepositoryJson.createOrUpdate(newMovie);
-            assertEquals(sizeBeforeAdding + 1, movieTableRepositoryJson.getAll().size());
-            movieTableRepositoryJson.remove(movie);
+            Movie movie = movieTableRepository.createOrUpdate(newMovie);
+            assertEquals(sizeBeforeAdding + 1, movieTableRepository.getAll().size());
+            movieTableRepository.remove(movie);
         }
 
         @Test
         public void removeMovieFromDB() {
+          removeMovieFromDB(movieTableRepositoryJson);
+          removeMovieFromDB(movieTableRepositoryYaml);
+        }
+
+        private void removeMovieFromDB(DBTableRepository<Movie> movieTableRepository) {
             Movie newMovie = new Movie();
             newMovie.setName(NEW_MOVIE_NAME);
             newMovie.setType(MovieType.NEW);
             newMovie.setStockCount(100);
-            Movie movie = movieTableRepositoryJson.createOrUpdate(newMovie);
-            int sizeBeforeDelete = movieTableRepositoryJson.getAll().size();
-            movieTableRepositoryJson.remove(movie);
-            assertEquals(sizeBeforeDelete - 1, movieTableRepositoryJson.getAll().size());
+            Movie movie = movieTableRepository.createOrUpdate(newMovie);
+            int sizeBeforeDelete = movieTableRepository.getAll().size();
+            movieTableRepository.remove(movie);
+            assertEquals(sizeBeforeDelete - 1, movieTableRepository.getAll().size());
         }
-
 
         @Test
         public void getMovieById() {
+            getMovieById(movieTableRepositoryYaml);
+            getMovieById(movieTableRepositoryJson);
+        }
+
+        private void getMovieById(DBTableRepository<Movie> movieTableRepository) {
             String nameFromExampleDB = "The Avengers";
-            Movie movie = movieTableRepositoryJson.findById(1);
+            Movie movie = movieTableRepository.findById(1);
             assertEquals(nameFromExampleDB, movie.getName());
         }
+
 
     }
 
@@ -165,7 +184,12 @@ public class DatabaseTest {
 
         @Test
         public void getAllOrdersFromDB() {
-            assertEquals(1, rentOrderTableRepositoryJson.getAll().size());
+            getAllOrdersFromDB(rentOrderTableRepositoryJson);
+            getAllOrdersFromDB(rentOrderTableRepositoryYaml);
+        }
+
+        private void getAllOrdersFromDB(DBTableRepository<RentOrder> rentOrderTableRepository) {
+            assertEquals(1, rentOrderTableRepository.getAll().size());
         }
 
         public RentOrder createOrder() {
@@ -191,31 +215,46 @@ public class DatabaseTest {
 
         @Test
         public void addNewOrderToDB() {
-            int sizeBeforeAdding = rentOrderTableRepositoryJson.getAll().size();
+            addNewOrder(rentOrderTableRepositoryYaml);
+            addNewOrder(rentOrderTableRepositoryJson);
+        }
+
+        private void addNewOrder(DBTableRepository<RentOrder> rentOrderTableRepository) {
+            int sizeBeforeAdding = rentOrderTableRepository.getAll().size();
             RentOrder order = createOrder();
-            RentOrder newOrder = rentOrderTableRepositoryJson.createOrUpdate(order);
-            assertEquals(sizeBeforeAdding + 1, rentOrderTableRepositoryJson.getAll().size());
-            rentOrderTableRepositoryJson.remove(newOrder);
+            RentOrder newOrder = rentOrderTableRepository.createOrUpdate(order);
+            assertEquals(sizeBeforeAdding + 1, rentOrderTableRepository.getAll().size());
+            rentOrderTableRepository.remove(newOrder);
         }
 
 
         @Test
         public void removeOrderFromDB() {
+            removeOrderFromDB(rentOrderTableRepositoryJson);
+            removeOrderFromDB(rentOrderTableRepositoryYaml);
+        }
+
+        private void removeOrderFromDB(DBTableRepository<RentOrder> rentOrderTableRepository) {
             RentOrder order = createOrder();
-            RentOrder newOrder = rentOrderTableRepositoryJson.createOrUpdate(order);
-            int sizeBeforeDelete = rentOrderTableRepositoryJson.getAll().size();
-            rentOrderTableRepositoryJson.remove(newOrder);
-            assertEquals(sizeBeforeDelete - 1, rentOrderTableRepositoryJson.getAll().size());
+            RentOrder newOrder = rentOrderTableRepository.createOrUpdate(order);
+            int sizeBeforeDelete = rentOrderTableRepository.getAll().size();
+            rentOrderTableRepository.remove(newOrder);
+            assertEquals(sizeBeforeDelete - 1, rentOrderTableRepository.getAll().size());
         }
 
 
         @Test
         public void getOrderById() {
+            getOrderById(rentOrderTableRepositoryYaml);
+            getOrderById(rentOrderTableRepositoryJson);
+        }
+
+        private void getOrderById(DBTableRepository<RentOrder> rentOrderTableRepository) {
             RentOrder order = createOrder();
-            RentOrder createdOrder = rentOrderTableRepositoryJson.createOrUpdate(order);
-            RentOrder orderById = rentOrderTableRepositoryJson.findById(createdOrder.getId());
+            RentOrder createdOrder = rentOrderTableRepository.createOrUpdate(order);
+            RentOrder orderById = rentOrderTableRepository.findById(createdOrder.getId());
             assertEquals(createdOrder, orderById);
-            rentOrderTableRepositoryJson.remove(createdOrder);
+            rentOrderTableRepository.remove(createdOrder);
         }
 
     }
