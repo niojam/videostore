@@ -12,12 +12,15 @@ import static test.fujitsu.videostore.backend.database.DBTableRepository.ENTITY_
 
 public class CustomerRepoConnector extends DBConnector<Customer> {
 
-    private static CustomerRepoConnector customerRepositoryConnector = new CustomerRepoConnector();
+    private static CustomerRepoConnector customerRepositoryConnector;
 
     private CustomerRepoConnector() {
     }
 
     public static CustomerRepoConnector getInstance() {
+        if (customerRepositoryConnector == null) {
+            customerRepositoryConnector = new CustomerRepoConnector();
+        }
         return customerRepositoryConnector;
     }
 

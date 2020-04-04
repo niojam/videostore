@@ -23,7 +23,7 @@ public class MovieRepository implements DBTableRepository<Movie> {
         this.dbConnector = MovieRepoConnector.getInstance();
         movieList = this.dbConnector.readData(ENTITY_TYPE_MOVIE, type);
     }
-    public static MovieRepository getInstance() {
+    synchronized  public static MovieRepository getInstance() {
         return movieRepository;
     }
 

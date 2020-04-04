@@ -22,7 +22,7 @@ public class CustomerRepository implements DBTableRepository<Customer> {
         customerList =  this.dbConnector.readData(ENTITY_TYPE_CUSTOMER, type);
     }
 
-    public static CustomerRepository getInstance() {
+    synchronized public static CustomerRepository getInstance() {
         return customerRepository;
     }
 

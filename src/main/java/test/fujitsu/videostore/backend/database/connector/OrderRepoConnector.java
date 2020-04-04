@@ -18,12 +18,15 @@ import static test.fujitsu.videostore.backend.database.DBTableRepository.ENTITY_
 
 public class OrderRepoConnector extends DBConnector<RentOrder> {
 
-    private static OrderRepoConnector orderRepoConnector = new OrderRepoConnector();
+    private static OrderRepoConnector orderRepoConnector;
 
     private OrderRepoConnector() {
     }
 
     public static OrderRepoConnector getInstance() {
+        if (orderRepoConnector == null) {
+            orderRepoConnector = new OrderRepoConnector();
+        }
         return orderRepoConnector;
     }
 
