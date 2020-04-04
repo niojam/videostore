@@ -3,6 +3,7 @@ package test.fujitsu.videostore.ui.customer.components;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -16,6 +17,8 @@ import test.fujitsu.videostore.ui.customer.CustomerListLogic;
  */
 public class CustomerForm extends Div {
 
+    public static final String SAME_NAME_NOTIFICATION = "Customer with this name already exists";
+    public static final String INVALID_CUSTOMER_NITIFICATION = "Please check new Customer fields";
     private VerticalLayout content;
 
     private TextField name;
@@ -56,6 +59,7 @@ public class CustomerForm extends Div {
                 .bind("name");
         binder.forField(points)
                 .withConverter(new StringToIntegerConverter("Invalid bonus points format"))
+                .withValidator(newPoints -> newPoints == null || newPoints >= 0, "Points cannot be negative")
                 .bind("points");
 
         // enable/disable save button while editing
@@ -71,11 +75,19 @@ public class CustomerForm extends Div {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         save.addClickListener(event -> {
             if (currentCustomer != null) {
-                // TODO: Perform validations here. Need to validate that customer name is filled, bonus points have correct integer representation.
-                // TODO: Validation that customer with same name is not present already in database.
-
+                Notification validityNotification = new Notification("", 3000, Notification.Position.MIDDLE);
                 binder.writeBeanIfValid(currentCustomer);
-                viewLogic.saveCustomer(currentCustomer);
+                if (viewLogic.validateCustomer(currentCustomer)) {
+                    validityNotification.setText(INVALID_CUSTOMER_NITIFICATION);
+                    validityNotification.open();
+                    return;
+                }
+                if (viewLogic.checkNameAppearance(currentCustomer.getName())) {
+                    validityNotification.setText(SAME_NAME_NOTIFICATION);
+                    validityNotification.open();
+                } else {
+                    viewLogic.saveCustomer(currentCustomer);
+                }
             }
         });
 
@@ -107,7 +119,6 @@ public class CustomerForm extends Div {
         currentCustomer = customer;
         binder.readBean(customer);
 
-        // TODO: Customer deletion button should be inactive if it’s new customer creation or customer have active rent’s. If customer deleted, then all his already inactive rent’s should be deleted also.
         delete.setEnabled(!viewLogic.canBeDeleted(customer));
     }
 }
