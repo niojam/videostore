@@ -48,6 +48,7 @@ public class DatabaseTest {
     public class TestCustomerRepository {
 
         public static final String NEW_CUSTOMER_NAME = "Nikita O";
+        public static final int CUTOMERS_INITITAL_COUNT = 4;
 
         @Test
         public void getAllCustomersFromDB() {
@@ -57,7 +58,7 @@ public class DatabaseTest {
 
 
         private void getAllCustomers(DBTableRepository<Customer> tableRepository) {
-            assertEquals(4, tableRepository.getAll().size());
+            assertEquals(CUTOMERS_INITITAL_COUNT, tableRepository.getAll().size());
         }
 
 
@@ -115,6 +116,7 @@ public class DatabaseTest {
 
 
         public static final String NEW_MOVIE_NAME = "Film";
+        public static final int MOVIES_INITIAL_COUNT = 12;
 
         @Test
         public void getAllMoviesFromDB() {
@@ -123,8 +125,7 @@ public class DatabaseTest {
         }
 
         private void getAllMoviesFromDB(DBTableRepository<Movie> movieTableRepository) {
-            assertEquals(12, movieTableRepository.getAll().size());
-            assertEquals(12, movieTableRepository.getAll().size());
+            assertEquals(MOVIES_INITIAL_COUNT, movieTableRepository.getAll().size());
         }
 
         @Test
@@ -183,6 +184,7 @@ public class DatabaseTest {
 
         public static final String NEW_ORDER_CUSTOMER_NAME = "Maria Kusk";
         public static final String NEW_MOVIE_NAME = "Film";
+        public static final int ORDERS_INITIAL_COUNT = 1;
 
         @Test
         public void getAllOrdersFromDB() {
@@ -191,7 +193,7 @@ public class DatabaseTest {
         }
 
         private void getAllOrdersFromDB(DBTableRepository<RentOrder> rentOrderTableRepository) {
-            assertEquals(1, rentOrderTableRepository.getAll().size());
+            assertEquals(ORDERS_INITIAL_COUNT, rentOrderTableRepository.getAll().size());
         }
 
         public RentOrder createOrder() {
