@@ -117,7 +117,7 @@ public class VideoStoreInventoryLogic {
     public boolean canBeDeleted(Movie movie) {
         return OrderRepository.getInstance().getAll().stream()
                 .anyMatch(order -> order.getItems().stream()
-                        .anyMatch(orderItem -> orderItem.getMovie().equals(movie))) || movie.getId() == -1;
+                        .anyMatch(orderItem -> orderItem.getMovie().equals(movie))) || movie.isNewObject();
     }
 
     public List<Movie> filterByName(String movieName) {

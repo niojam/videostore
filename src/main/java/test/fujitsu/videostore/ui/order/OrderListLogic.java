@@ -147,7 +147,7 @@ public class OrderListLogic {
         if (order.getItems() == null) {
             return false;
         }
-        return order.getId() == -1 || order.getItems().stream()
+        return order.isNewObject() || order.getItems().stream()
                 .anyMatch(item -> item.getReturnedDay() == null);
     }
 

@@ -119,7 +119,7 @@ public class CustomerListLogic {
         return OrderRepository.getInstance().getAll().stream()
                 .anyMatch(order -> order.getCustomer().getId() == customer.getId()
                         & order.getItems().stream().anyMatch((item -> item.getReturnedDay() == null)))
-                || customer.getId() == -1;
+                || customer.isNewObject();
     }
 
     public List<Customer> filterByName(String inputName) {
