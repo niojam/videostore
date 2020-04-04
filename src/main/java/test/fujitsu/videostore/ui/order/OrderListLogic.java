@@ -13,6 +13,8 @@ import test.fujitsu.videostore.ui.database.CurrentDatabase;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static test.fujitsu.videostore.backend.reciept.OrderToReceiptService.NEW_REALISE_BONUS_PRICE;
+
 public class OrderListLogic {
 
     private OrderList view;
@@ -155,6 +157,17 @@ public class OrderListLogic {
         }
         return order.getItems().stream()
                 .anyMatch(item -> item.getReturnedDay() == null) & order.getId() != -1;
+    }
+
+
+    public boolean validateOrderBonuses(RentOrder currentOrder) {
+        return currentOrder.getItems().stream().filter(RentOrder.Item::isPaidByBonus)
+                .map(item -> item.getDays() * NEW_REALISE_BONUS_PRICE)
+                .reduce(0, Integer::sum) > currentOrder.getCustomer().getPoints();
+    }
+
+    public boolean validateOrderCustomer(RentOrder order) {
+        return order.getCustomer() == null || order.getCustomer().getName().equals("");
     }
 
     public DBTableRepository<RentOrder> getRepository() {

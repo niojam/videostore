@@ -16,11 +16,12 @@ import test.fujitsu.videostore.backend.reciept.PrintableOrderReceipt;
 import test.fujitsu.videostore.ui.database.CurrentDatabase;
 import test.fujitsu.videostore.ui.order.OrderListLogic;
 
-import static test.fujitsu.videostore.backend.reciept.OrderToReceiptService.NEW_REALISE_BONUS_PRICE;
+import java.util.Objects;
 
 public class OrderForm extends Div {
 
     public static final String NOW_ENOUGH_BONUS_POINTS_NOTIFICATION = "Now enough bonus points";
+    public static final String NO_CUSTOMER_NAME_NOTIFICATION = "Please insert customer name";
     private VerticalLayout content;
 
     private ComboBox<Customer> customerComboBox;
@@ -70,6 +71,7 @@ public class OrderForm extends Div {
         binder = new Binder<>(RentOrder.class);
         binder.forField(customerComboBox)
                 .asRequired()
+                .withValidator(Objects::nonNull, "Customer not specified")
                 .bind("customer");
         binder.forField(orderDate)
                 .bind("orderDate");
@@ -90,9 +92,11 @@ public class OrderForm extends Div {
                 return;
             }
             binder.writeBeanIfValid(currentOrder);
-            if (currentOrder.getItems().stream().filter(RentOrder.Item::isPaidByBonus)
-                    .map(item -> item.getDays() * NEW_REALISE_BONUS_PRICE)
-                    .reduce(0, Integer::sum) > currentOrder.getCustomer().getPoints()) {
+            if (viewLogic.validateOrderCustomer(currentOrder)){
+                Notification.show(NO_CUSTOMER_NAME_NOTIFICATION, 3000, Notification.Position.MIDDLE);
+                return;
+            }
+            if (viewLogic.validateOrderBonuses(currentOrder)) {
                 Notification.show(NOW_ENOUGH_BONUS_POINTS_NOTIFICATION, 3000, Notification.Position.MIDDLE);
                 return;
             }

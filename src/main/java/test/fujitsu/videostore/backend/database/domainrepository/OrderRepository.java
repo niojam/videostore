@@ -23,7 +23,7 @@ public class OrderRepository implements DBTableRepository<RentOrder> {
         });
     }
 
-    synchronized public static OrderRepository getInstance() {
+    public static OrderRepository getInstance() {
         return orderRepository;
     }
 
